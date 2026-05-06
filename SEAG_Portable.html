@@ -1,0 +1,3755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!--
+  ============================================================
+  Social Engineering Awareness Game (SEAG)
+  Project:  Social Engineering Awareness Training Game
+  Author:   Daniel Olubajo
+  File:     index.html
+  Version:  1.0.0
+
+  Stack:    HTML5 · CSS3 (style.css) · Vanilla JS (script.js)
+  Data:     Google Sheets CSV via Fetch API + data_fallback.js
+  Fonts:    VT323 · Share Tech Mono · Rajdhani (Google Fonts)
+  Deploy:   GitHub Pages · Cloudflare Pages · Vercel · Render
+            (Static site — no server required)
+
+  Academic basis: Constructivist Learning Theory (Vygotsky; Bruner)
+  Project Year: 2025
+  ============================================================
+  -->
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="SENTRY — Social Engineering Awareness Training Game. An adaptive, gamified cybersecurity training system for Nigerian users, built for academic research.">
+  <meta name="author" content="Daniel Olubajo">
+  <meta name="keywords"
+    content="social engineering, cybersecurity, phishing, awareness training, gamification, Nigeria">
+
+  <!-- Open Graph (for GitHub Pages / social sharing) -->
+  <meta property="og:title"       content="SENTRY — Social Engineering Awareness Game">
+  <meta property="og:description" content="Train your threat detection skills against Nigerian-contextualised social engineering attacks.">
+  <meta property="og:type"        content="website">
+
+  <!-- Canonical title -->
+  <title>SENTRY — Social Engineering Awareness Game</title>
+
+  <!-- Favicon: inline SVG shield -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2L4 7v9c0 7.5 5.2 14.4 12 16.5C22.8 30.4 28 23.5 28 16V7L16 2z' fill='%230f172a' stroke='%2338bdf8' stroke-width='1.5'/%3E%3Cpath d='M12 16l3 3 5-5' stroke='%2322c55e' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+
+  <!-- Google Fonts: VT323 (terminal) | Share Tech Mono (body) | Rajdhani (UI) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap"
+        rel="stylesheet">
+
+  <!-- Inline stylesheet (bundled for portability) -->
+  <style>
+/*
+ * ============================================================
+ * Social Engineering Awareness Game (SEAG) — Stylesheet
+ * Project:  Social Engineering Awareness Training Game
+ * Author:   Daniel Olubajo
+ * File:     style.css
+ * Theme:    Cyber-Terminal / Dark Military Operations
+ *
+ * Palette:
+ *   Deep Slate  → #0f172a  (primary background)
+ *   Electric Blue → #38bdf8 (primary accent)
+ *   Neon Green  → #22c55e  (success / positive)
+ *   Amber       → #f59e0b  (warnings / hints)
+ *   Crimson     → #ef4444  (errors / breach)
+ *   Surface     → #1e293b  (card backgrounds)
+ *   Muted       → #475569  (secondary text)
+ *   Text        → #e2e8f0  (primary text)
+ *
+ * Fonts (Google Fonts):
+ *   VT323         → Terminal / display headings
+ *   Share Tech Mono → Body / code / scenario text
+ *   Rajdhani      → UI labels / buttons
+ * ============================================================
+ */
+
+
+/* ─── 1. CSS CUSTOM PROPERTIES ─────────────────────────────────────────────── */
+
+:root {
+  /* Core palette */
+  --bg-primary:    #0f172a;
+  --bg-surface:    #1e293b;
+  --bg-elevated:   #263347;
+  --bg-overlay:    rgba(15, 23, 42, 0.92);
+
+  --accent-blue:   #38bdf8;
+  --accent-green:  #22c55e;
+  --accent-amber:  #f59e0b;
+  --accent-red:    #ef4444;
+  --accent-purple: #a78bfa;
+
+  --text-primary:  #e2e8f0;
+  --text-secondary:#94a3b8;
+  --text-muted:    #475569;
+  --text-inverse:  #0f172a;
+
+  /* Glow effects */
+  --glow-blue:   0 0 8px rgba(56, 189, 248, 0.6), 0 0 20px rgba(56, 189, 248, 0.2);
+  --glow-green:  0 0 8px rgba(34, 197, 94, 0.6),  0 0 20px rgba(34, 197, 94, 0.2);
+  --glow-red:    0 0 8px rgba(239, 68, 68, 0.6),  0 0 20px rgba(239, 68, 68, 0.2);
+  --glow-amber:  0 0 8px rgba(245, 158, 11, 0.5), 0 0 16px rgba(245, 158, 11, 0.15);
+
+  /* Border radii */
+  --radius-sm:  4px;
+  --radius-md:  8px;
+  --radius-lg:  12px;
+
+  /* Transitions */
+  --transition: 0.2s ease;
+  --transition-slow: 0.4s ease;
+
+  /* Typography scale */
+  --font-terminal: 'VT323', monospace;
+  --font-mono:     'Share Tech Mono', monospace;
+  --font-ui:       'Rajdhani', sans-serif;
+}
+
+
+/* ─── 2. RESET & BASE ───────────────────────────────────────────────────────── */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-mono);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+  /* Subtle grid background pattern */
+  background-image:
+    linear-gradient(rgba(56, 189, 248, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56, 189, 248, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Global link styles */
+a { color: var(--accent-blue); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* Scrollbar customization */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--accent-blue); border-radius: 3px; }
+
+
+/* ─── 3. SCANLINES OVERLAY ──────────────────────────────────────────────────── */
+
+.scanlines {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 1000;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.04) 2px,
+    rgba(0, 0, 0, 0.04) 4px
+  );
+  animation: scanMove 8s linear infinite;
+}
+
+@keyframes scanMove {
+  0%   { background-position: 0 0; }
+  100% { background-position: 0 100px; }
+}
+
+/* Moving scan line sweep */
+.scanlines::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(transparent, rgba(56, 189, 248, 0.06), transparent);
+  animation: scanSweep 6s ease-in-out infinite;
+}
+
+@keyframes scanSweep {
+  0%   { top: -3px; }
+  100% { top: 100vh; }
+}
+
+
+/* ─── 4. SCREEN SYSTEM ──────────────────────────────────────────────────────── */
+
+.screen {
+  display: none;
+  min-height: 100vh;
+  width: 100%;
+  padding: 16px;
+  position: relative;
+  animation: fadeIn 0.4s ease;
+}
+
+.screen.active {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+
+/* ─── 5. BOOT SCREEN ────────────────────────────────────────────────────────── */
+
+#screen-boot {
+  justify-content: center;
+  align-items: center;
+}
+
+.boot-container {
+  width: 100%;
+  max-width: 700px;
+  padding: 16px;
+}
+
+.boot-text {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  line-height: 1.7;
+  color: var(--accent-green);
+  text-shadow: var(--glow-green);
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.boot-line {
+  display: block;
+  animation: typeIn 0.05s ease forwards;
+  white-space: pre;
+}
+
+.boot-border {
+  color: var(--accent-blue);
+  text-shadow: var(--glow-blue);
+}
+
+@keyframes typeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Blinking cursor at boot end */
+.boot-text::after {
+  content: '▌';
+  animation: blink 1s step-end infinite;
+  color: var(--accent-green);
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+
+/* ─── 6. TERMINAL WINDOW COMPONENT ─────────────────────────────────────────── */
+
+.terminal-window {
+  width: 100%;
+  max-width: 720px;
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--bg-surface);
+  box-shadow: 0 0 40px rgba(56, 189, 248, 0.08), 0 20px 60px rgba(0,0,0,0.5);
+  margin: auto;
+}
+
+.terminal-titlebar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background: rgba(0,0,0,0.3);
+  border-bottom: 1px solid rgba(56, 189, 248, 0.15);
+}
+
+.terminal-dots {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+}
+.dot.red    { background: #ef4444; }
+.dot.yellow { background: #f59e0b; }
+.dot.green  { background: #22c55e; }
+
+.terminal-title {
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+.terminal-body {
+  padding: 28px 28px 32px;
+}
+
+
+/* ─── 7. REGISTRATION SCREEN ────────────────────────────────────────────────── */
+
+#screen-registration {
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+/* SENTRY header/logo block */
+.sentry-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.sentry-logo-svg {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 16px;
+  display: block;
+  filter: drop-shadow(var(--glow-blue));
+}
+
+.sentry-header h1 {
+  font-family: var(--font-terminal);
+  font-size: 2.2rem;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  color: var(--accent-blue);
+  text-shadow: var(--glow-blue);
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
+
+.sentry-subtitle {
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* SENTRY intro message panel */
+.sentry-intro-message {
+  background: rgba(56, 189, 248, 0.05);
+  border: 1px solid rgba(56, 189, 248, 0.15);
+  border-left: 3px solid var(--accent-blue);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-bottom: 28px;
+}
+
+.sentry-intro-message p {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+/* Form */
+.reg-form { display: flex; flex-direction: column; gap: 20px; }
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-field label {
+  font-family: var(--font-ui);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--accent-blue);
+  text-transform: uppercase;
+}
+
+.form-field input,
+.form-field select {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  padding: 10px 14px;
+  transition: border-color var(--transition), box-shadow var(--transition);
+  width: 100%;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.form-field input::placeholder { color: var(--text-muted); }
+
+.form-field input:focus,
+.form-field select:focus {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.15);
+}
+
+.form-field select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2338bdf8' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+  cursor: pointer;
+}
+
+.form-field select option {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+}
+
+.form-error {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--accent-red);
+}
+
+.form-error.hidden { display: none; }
+
+
+/* ─── 8. BUTTONS ────────────────────────────────────────────────────────────── */
+
+.btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: var(--accent-blue);
+  color: var(--text-inverse);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 13px 24px;
+  cursor: pointer;
+  width: 100%;
+  transition: background var(--transition), box-shadow var(--transition), transform var(--transition);
+}
+
+.btn-primary:hover {
+  background: #7dd3fc;
+  box-shadow: var(--glow-blue);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active { transform: translateY(0); }
+
+.btn-arrow {
+  font-size: 1rem;
+  transition: transform var(--transition);
+}
+.btn-primary:hover .btn-arrow { transform: translateX(4px); }
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: transparent;
+  color: var(--accent-blue);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 11px 20px;
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition), box-shadow var(--transition);
+}
+
+.btn-secondary:hover {
+  background: rgba(56, 189, 248, 0.08);
+  border-color: var(--accent-blue);
+  box-shadow: var(--glow-blue);
+}
+
+.btn-hint {
+  background: transparent;
+  border: 1px dashed rgba(245, 158, 11, 0.5);
+  color: var(--accent-amber);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 9px 18px;
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition), box-shadow var(--transition);
+}
+
+.btn-hint:hover:not(:disabled) {
+  background: rgba(245, 158, 11, 0.08);
+  border-color: var(--accent-amber);
+  box-shadow: var(--glow-amber);
+}
+
+.btn-hint:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  border-style: solid;
+}
+
+.btn-hint.used {
+  color: var(--text-muted);
+  border-color: var(--text-muted);
+}
+
+
+/* ─── 9. GAME SCREEN ────────────────────────────────────────────────────────── */
+
+#screen-game {
+  justify-content: flex-start;
+  padding: 0 0 32px;
+}
+
+/* HUD bar */
+.game-hud {
+  width: 100%;
+  background: rgba(0,0,0,0.4);
+  border-bottom: 1px solid rgba(56, 189, 248, 0.15);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(8px);
+  flex-wrap: wrap;
+}
+
+.hud-segment {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.hud-label {
+  font-family: var(--font-ui);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.hud-value {
+  font-family: var(--font-terminal);
+  font-size: 1.5rem;
+  color: var(--accent-blue);
+  text-shadow: var(--glow-blue);
+  line-height: 1;
+}
+
+.hud-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  min-width: 120px;
+}
+
+.xp-bar-track {
+  width: 100%;
+  max-width: 200px;
+  height: 4px;
+  background: rgba(56, 189, 248, 0.15);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.xp-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+  border-radius: 2px;
+  transition: width 0.5s ease;
+  box-shadow: var(--glow-blue);
+}
+
+.rank-display {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-ui);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--accent-blue);
+  letter-spacing: 0.08em;
+}
+
+.hud-streak-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.streak-flame {
+  font-size: 1rem;
+}
+
+/* Progress bar */
+.progress-bar-container {
+  width: 100%;
+  height: 28px;
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid rgba(56, 189, 248, 0.1);
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg,
+    rgba(56, 189, 248, 0.2),
+    rgba(34, 197, 94, 0.25)
+  );
+  transition: width 0.6s ease;
+  position: absolute;
+  top: 0; left: 0;
+}
+
+.progress-text {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-ui);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-left: auto;
+  margin-right: 16px;
+}
+
+/* Game area */
+.game-area {
+  width: 100%;
+  max-width: 720px;
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 0 auto;
+}
+
+/* SENTRY guidance panel */
+.sentry-guidance-panel {
+  background: rgba(56, 189, 248, 0.06);
+  border: 1px solid rgba(56, 189, 248, 0.15);
+  border-left: 3px solid var(--accent-blue);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.sentry-tag {
+  font-family: var(--font-terminal);
+  font-size: 1rem;
+  color: var(--accent-blue);
+  text-shadow: var(--glow-blue);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+#sentry-message {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* Scenario card */
+.scenario-card {
+  background: var(--bg-surface);
+  border: 1px solid rgba(56, 189, 248, 0.18);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+}
+
+.scenario-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.type-badge {
+  font-family: var(--font-ui);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid;
+}
+
+/* Type-specific badge colours */
+.type-phishing   { color: #f87171; border-color: #f87171; background: rgba(248, 113, 113, 0.1); }
+.type-vishing    { color: #c084fc; border-color: #c084fc; background: rgba(192, 132, 252, 0.1); }
+.type-smishing   { color: #fb923c; border-color: #fb923c; background: rgba(251, 146, 60, 0.1); }
+.type-baiting    { color: #34d399; border-color: #34d399; background: rgba(52, 211, 153, 0.1); }
+.type-pretexting { color: #facc15; border-color: #facc15; background: rgba(250, 204, 21, 0.1); }
+
+.scenario-level {
+  font-family: var(--font-ui);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--accent-amber);
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 3px;
+}
+
+.scenario-occupation {
+  font-family: var(--font-ui);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-left: auto;
+}
+
+.scenario-prompt-label {
+  display: block;
+  font-family: var(--font-ui);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.scenario-text {
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  line-height: 1.75;
+  color: var(--text-primary);
+}
+
+/* Choice buttons */
+.choices-section { display: flex; flex-direction: column; gap: 10px; }
+
+.choices-label {
+  font-family: var(--font-ui);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.choices-container { display: flex; flex-direction: column; gap: 10px; }
+
+.choice-btn {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(71, 85, 105, 0.5);
+  border-radius: var(--radius-md);
+  padding: 13px 16px;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition), transform var(--transition);
+  width: 100%;
+}
+
+.choice-btn:hover:not(:disabled) {
+  background: rgba(56, 189, 248, 0.08);
+  border-color: rgba(56, 189, 248, 0.5);
+  transform: translateX(3px);
+}
+
+.choice-btn:disabled { cursor: not-allowed; }
+
+.choice-btn.correct {
+  background: rgba(34, 197, 94, 0.12);
+  border-color: var(--accent-green);
+  box-shadow: var(--glow-green);
+}
+
+.choice-btn.incorrect {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: var(--accent-red);
+  box-shadow: var(--glow-red);
+}
+
+.choice-letter {
+  font-family: var(--font-terminal);
+  font-size: 1.1rem;
+  color: var(--accent-blue);
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: var(--radius-sm);
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.choice-text {
+  font-family: var(--font-mono);
+  font-size: 0.84rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+  flex: 1;
+}
+
+/* Hint section */
+.hint-section { display: flex; flex-direction: column; gap: 10px; }
+
+.hint-box {
+  background: rgba(245, 158, 11, 0.07);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-left: 3px solid var(--accent-amber);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  animation: fadeIn 0.3s ease;
+}
+
+.hint-box.hidden { display: none; }
+
+.hint-icon { margin-right: 8px; }
+
+.hint-text {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--accent-amber);
+  line-height: 1.6;
+}
+
+
+/* ─── 10. FEEDBACK SCREEN ───────────────────────────────────────────────────── */
+
+#screen-feedback {
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+.feedback-container {
+  width: 100%;
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.result-banner {
+  font-family: var(--font-terminal);
+  font-size: 1.6rem;
+  letter-spacing: 0.06em;
+  text-align: center;
+  padding: 16px 24px;
+  border-radius: var(--radius-md);
+  border: 2px solid;
+}
+
+.result-banner.correct {
+  color: var(--accent-green);
+  border-color: var(--accent-green);
+  background: rgba(34, 197, 94, 0.08);
+  text-shadow: var(--glow-green);
+  box-shadow: var(--glow-green);
+}
+
+.result-banner.incorrect {
+  color: var(--accent-red);
+  border-color: var(--accent-red);
+  background: rgba(239, 68, 68, 0.08);
+  text-shadow: var(--glow-red);
+  box-shadow: var(--glow-red);
+}
+
+/* Breach warning */
+.breach-warning {
+  background: rgba(239, 68, 68, 0.07);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  animation: pulseRed 2s ease infinite;
+}
+
+.breach-warning.hidden { display: none; }
+
+.breach-header {
+  font-family: var(--font-terminal);
+  font-size: 1.1rem;
+  color: var(--accent-red);
+  text-shadow: var(--glow-red);
+  margin-bottom: 6px;
+  letter-spacing: 0.06em;
+}
+
+.breach-details {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: #fca5a5;
+  line-height: 1.5;
+}
+
+@keyframes pulseRed {
+  0%, 100% { border-color: rgba(239, 68, 68, 0.4); }
+  50%       { border-color: rgba(239, 68, 68, 0.7); }
+}
+
+/* Feedback stats row */
+.feedback-stats { display: flex; flex-direction: column; gap: 8px; }
+
+.xp-change {
+  font-family: var(--font-terminal);
+  font-size: 1.2rem;
+  letter-spacing: 0.06em;
+  text-align: center;
+}
+
+.xp-change.positive { color: var(--accent-green); text-shadow: var(--glow-green); }
+.xp-change.neutral  { color: var(--text-muted); }
+
+.streak-notification {
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--accent-amber);
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: var(--radius-sm);
+  padding: 8px;
+}
+
+.streak-notification.hidden { display: none; }
+
+.correct-answer-display {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--accent-green);
+  background: rgba(34, 197, 94, 0.06);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  text-align: center;
+}
+
+.correct-answer-display.hidden { display: none; }
+
+/* Red Flag Analysis panel */
+.red-flag-analysis {
+  background: var(--bg-surface);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.rfa-header {
+  background: rgba(56, 189, 248, 0.07);
+  border-bottom: 1px solid rgba(56, 189, 248, 0.15);
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.rfa-title {
+  font-family: var(--font-terminal);
+  font-size: 1.1rem;
+  color: var(--accent-blue);
+  text-shadow: var(--glow-blue);
+  letter-spacing: 0.05em;
+}
+
+.attack-type-display {
+  font-family: var(--font-ui);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.psych-principle-container {
+  padding: 12px 18px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.psych-label {
+  font-family: var(--font-ui);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.psych-principle {
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--accent-amber);
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 999px;
+  padding: 3px 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.explanation-container { padding: 12px 18px 18px; }
+
+.red-flag-explanation {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 1.75;
+  color: var(--text-secondary);
+}
+
+
+/* ─── 11. COMPLETION SCREEN ─────────────────────────────────────────────────── */
+
+#screen-complete {
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+.complete-container {
+  width: 100%;
+  max-width: 640px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.complete-header {
+  text-align: center;
+}
+
+.complete-header h2 {
+  font-family: var(--font-terminal);
+  font-size: 2rem;
+  color: var(--accent-blue);
+  text-shadow: var(--glow-blue);
+  letter-spacing: 0.06em;
+  margin: 8px 0;
+}
+
+.complete-player-name {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+/* Rank badge */
+.rank-badge-large {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  border: 3px solid;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: all 0.5s ease;
+  animation: rankReveal 0.8s ease;
+}
+
+@keyframes rankReveal {
+  from { transform: scale(0.5) rotate(-10deg); opacity: 0; }
+  to   { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+.badge-novice {
+  border-color: #94a3b8;
+  color: #94a3b8;
+  background: rgba(148, 163, 184, 0.06);
+  box-shadow: 0 0 30px rgba(148, 163, 184, 0.2);
+}
+
+.badge-defender {
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
+  background: rgba(56, 189, 248, 0.06);
+  box-shadow: var(--glow-blue);
+}
+
+.badge-sentinel {
+  border-color: var(--accent-green);
+  color: var(--accent-green);
+  background: rgba(34, 197, 94, 0.06);
+  box-shadow: var(--glow-green);
+}
+
+.rank-icon-large { font-size: 3rem; line-height: 1; }
+
+.complete-rank-desc {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-align: center;
+  max-width: 480px;
+}
+
+/* Stats grid */
+.complete-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  width: 100%;
+}
+
+.stat-box {
+  background: var(--bg-surface);
+  border: 1px solid rgba(56, 189, 248, 0.15);
+  border-radius: var(--radius-md);
+  padding: 16px 12px;
+  text-align: center;
+}
+
+.stat-value {
+  font-family: var(--font-terminal);
+  font-size: 2rem;
+  color: var(--accent-blue);
+  text-shadow: var(--glow-blue);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-family: var(--font-ui);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+/* Complete action buttons */
+.complete-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.complete-actions-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+
+/* ─── 12. LEADERBOARD SCREEN ────────────────────────────────────────────────── */
+
+#screen-leaderboard {
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+.leaderboard-container {
+  width: 100%;
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.leaderboard-header {
+  text-align: center;
+}
+
+.leaderboard-header h2 {
+  font-family: var(--font-terminal);
+  font-size: 2rem;
+  color: var(--accent-blue);
+  text-shadow: var(--glow-blue);
+  letter-spacing: 0.06em;
+  margin: 8px 0;
+}
+
+.leaderboard-header p {
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.leaderboard-entries { display: flex; flex-direction: column; gap: 8px; }
+
+.lb-empty {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 32px;
+  border: 1px dashed rgba(56, 189, 248, 0.2);
+  border-radius: var(--radius-md);
+}
+
+.lb-entry {
+  background: var(--bg-surface);
+  border: 1px solid rgba(56, 189, 248, 0.12);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  display: grid;
+  grid-template-columns: 36px 1fr 1fr auto auto auto auto;
+  gap: 10px;
+  align-items: center;
+  transition: border-color var(--transition);
+}
+
+.lb-entry:hover { border-color: rgba(56, 189, 248, 0.3); }
+
+.lb-entry.lb-top {
+  border-color: rgba(245, 158, 11, 0.4);
+  background: rgba(245, 158, 11, 0.04);
+}
+
+.lb-pos {
+  font-family: var(--font-terminal);
+  font-size: 1.2rem;
+  text-align: center;
+}
+
+.lb-name {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lb-occ, .lb-rank-name {
+  font-family: var(--font-ui);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lb-accuracy, .lb-date {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.lb-xp {
+  font-family: var(--font-terminal);
+  font-size: 1.2rem;
+  color: var(--accent-blue);
+  text-shadow: var(--glow-blue);
+  white-space: nowrap;
+}
+
+.leaderboard-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-danger {
+  background: transparent;
+  color: var(--accent-red);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 9px 16px;
+  cursor: pointer;
+  transition: background var(--transition), box-shadow var(--transition);
+}
+
+.btn-danger:hover {
+  background: rgba(239, 68, 68, 0.08);
+  box-shadow: var(--glow-red);
+}
+
+
+/* ─── 13. UTILITY / SHARED ──────────────────────────────────────────────────── */
+
+.hidden { display: none !important; }
+
+/* Corner accent decorations */
+.corner-tl, .corner-tr, .corner-bl, .corner-br {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-color: var(--accent-blue);
+  opacity: 0.4;
+}
+
+.corner-tl { top: 12px; left: 12px;  border-top: 1px solid; border-left: 1px solid; }
+.corner-tr { top: 12px; right: 12px; border-top: 1px solid; border-right: 1px solid; }
+.corner-bl { bottom: 12px; left: 12px;  border-bottom: 1px solid; border-left: 1px solid; }
+.corner-br { bottom: 12px; right: 12px; border-bottom: 1px solid; border-right: 1px solid; }
+
+
+/* ─── 14. RESPONSIVE — TABLET (≥ 600px) ────────────────────────────────────── */
+
+@media (min-width: 600px) {
+  .terminal-body { padding: 32px 36px 40px; }
+
+  .sentry-header h1 { font-size: 2.6rem; }
+
+  .game-hud { flex-wrap: nowrap; }
+
+  .hud-value { font-size: 1.8rem; }
+
+  .choice-btn { padding: 14px 18px; }
+
+  .choice-text { font-size: 0.88rem; }
+
+  .result-banner { font-size: 1.8rem; }
+
+  .complete-stats-grid { grid-template-columns: repeat(5, 1fr); }
+
+  .complete-actions { flex-direction: row; flex-wrap: wrap; }
+
+  .complete-actions .btn-primary { flex: 1; }
+
+  .complete-actions .btn-secondary { flex: 1; min-width: 180px; }
+
+  .leaderboard-actions { flex-wrap: nowrap; }
+}
+
+
+/* ─── 15. RESPONSIVE — DESKTOP (≥ 900px) ───────────────────────────────────── */
+
+@media (min-width: 900px) {
+  body { font-size: 17px; }
+
+  .screen { padding: 24px; }
+
+  #screen-game { padding: 0 0 48px; }
+
+  .game-area { padding: 24px 20px; gap: 20px; }
+
+  .scenario-card { padding: 24px 28px; }
+
+  .scenario-text { font-size: 0.92rem; }
+
+  .feedback-container { gap: 20px; }
+
+  .red-flag-explanation { font-size: 0.86rem; }
+
+  .rank-badge-large { width: 180px; height: 180px; }
+}
+
+
+/* ─── 16. PRINT STYLES (for supervisor demos) ───────────────────────────────── */
+
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+
+  .scanlines,
+  .game-hud,
+  .progress-bar-container { display: none; }
+
+  .screen { display: block !important; page-break-before: always; }
+}
+
+  </style>
+</head>
+
+<body>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SCANLINES OVERLAY — visual CRT effect, purely decorative
+  ═══════════════════════════════════════════════════════════════ -->
+  <div class="scanlines" aria-hidden="true"></div>
+
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SCREEN 1: BOOT SEQUENCE
+       Shows animated terminal startup text while data loads.
+       Transitions automatically to Screen 2 after completion.
+  ═══════════════════════════════════════════════════════════════ -->
+  <main id="screen-boot" class="screen active" role="main" aria-label="System boot sequence">
+    <div class="boot-container">
+      <pre id="boot-text" class="boot-text" aria-live="polite"></pre>
+    </div>
+  </main>
+
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SCREEN 2: PLAYER REGISTRATION
+       Collects Name, Age, and Occupation.
+       Occupation drives the adaptive scenario filtering engine.
+  ═══════════════════════════════════════════════════════════════ -->
+  <section id="screen-registration" class="screen" aria-label="Operative registration">
+
+    <div class="terminal-window" role="form" aria-labelledby="reg-heading">
+      <!-- Window chrome -->
+      <div class="terminal-titlebar" aria-hidden="true">
+        <div class="terminal-dots">
+          <span class="dot red"></span>
+          <span class="dot yellow"></span>
+          <span class="dot green"></span>
+        </div>
+        <span class="terminal-title">SENTRY SYSTEM — OPERATIVE REGISTRATION — SESSION INIT</span>
+      </div>
+
+      <div class="terminal-body">
+        <!-- SENTRY branding -->
+        <div class="sentry-header">
+          <!-- Shield SVG logo -->
+          <svg class="sentry-logo-svg" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <filter id="glow">
+                <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                <feMerge>
+                  <feMergeNode in="coloredBlur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+            </defs>
+            <path d="M40 4L8 16v20c0 20 14 36 32 44 18-8 32-24 32-44V16L40 4z"
+                  fill="#0f172a" stroke="#38bdf8" stroke-width="2.5" filter="url(#glow)"/>
+            <path d="M40 4L8 16v20c0 20 14 36 32 44 18-8 32-24 32-44V16L40 4z"
+                  fill="none" stroke="rgba(56,189,248,0.2)" stroke-width="6"/>
+            <path d="M28 41l9 9 16-16" stroke="#22c55e" stroke-width="4"
+                  fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
+            <circle cx="40" cy="38" r="14" fill="none" stroke="rgba(56,189,248,0.15)" stroke-width="1"/>
+          </svg>
+
+          <h1 id="reg-heading">SENTRY</h1>
+          <p class="sentry-subtitle">Social Engineering Awareness Training System · v1.0</p>
+        </div>
+
+        <!-- SENTRY briefing message -->
+        <div class="sentry-intro-message" role="note" aria-label="SENTRY briefing">
+          <p>
+            <strong style="color: var(--accent-blue)">SENTRY &gt;</strong>
+            Welcome, Operative. This system will expose you to simulated social engineering
+            attacks — phishing, vishing, smishing, pretexting, and baiting —
+            contextualised for the Nigerian threat landscape. Your responses will be
+            evaluated in real time. Complete your registration profile to begin.
+          </p>
+        </div>
+
+        <!-- Registration form fields -->
+        <div class="reg-form" role="group" aria-label="Registration fields">
+
+          <!-- Full Name -->
+          <div class="form-field">
+            <label for="reg-name">OPERATIVE NAME</label>
+            <input
+              type="text"
+              id="reg-name"
+              name="operative-name"
+              placeholder="Enter your full name"
+              autocomplete="off"
+              maxlength="60"
+              aria-required="true"
+              aria-describedby="reg-name-error">
+            <span id="reg-name-error" class="form-error hidden" role="alert"></span>
+          </div>
+
+          <!-- Age -->
+          <div class="form-field">
+            <label for="reg-age">AGE</label>
+            <input
+              type="number"
+              id="reg-age"
+              name="operative-age"
+              placeholder="Enter your age"
+              min="10"
+              max="100"
+              aria-required="true"
+              aria-describedby="reg-age-error">
+            <span id="reg-age-error" class="form-error hidden" role="alert"></span>
+          </div>
+
+          <!-- Occupation — drives adaptive filtering -->
+          <div class="form-field">
+            <label for="reg-occupation">OCCUPATION PROFILE
+              <span style="color:var(--text-muted); font-size:0.6rem; text-transform:none; letter-spacing:0; font-weight:400;">
+                (determines your threat scenario set)
+              </span>
+            </label>
+            <select
+              id="reg-occupation"
+              name="operative-occupation"
+              aria-required="true"
+              aria-describedby="reg-occ-error">
+              <option value="">— Select your occupation —</option>
+              <option value="Student" selected>Student</option>
+              <option value="IT Professional">IT Professional</option>
+              <option value="Healthcare Worker">Healthcare Worker</option>
+              <option value="Government Employee">Government Employee</option>
+              <option value="General Public">General Public</option>
+            </select>
+            <span id="reg-occ-error" class="form-error hidden" role="alert"></span>
+          </div>
+
+          <!-- Submit -->
+          <button id="reg-submit" class="btn-primary" type="button"
+                  aria-label="Begin training session">
+            BEGIN TRAINING SESSION
+            <span class="btn-arrow" aria-hidden="true">▶</span>
+          </button>
+
+        </div><!-- /.reg-form -->
+      </div><!-- /.terminal-body -->
+    </div><!-- /.terminal-window -->
+
+  </section><!-- /#screen-registration -->
+
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SCREEN 3: GAME — SCENARIO PRESENTATION
+       Adaptive scenario display with SENTRY guidance, type badges,
+       choice buttons, and the hint system.
+  ═══════════════════════════════════════════════════════════════ -->
+  <section id="screen-game" class="screen" aria-label="Training scenario">
+
+    <!-- HUD: persistent top bar with XP, rank, streak, player name -->
+    <header class="game-hud" role="banner" aria-label="Training HUD">
+
+      <!-- Player name segment -->
+      <div class="hud-segment" aria-label="Operative name">
+        <span class="hud-label">OPERATIVE</span>
+        <span class="hud-value" id="hud-player" style="font-size:1.1rem; font-family:var(--font-ui); color:var(--text-primary);">—</span>
+      </div>
+
+      <!-- Central XP/rank segment -->
+      <div class="hud-center" aria-label="XP and rank">
+        <div class="rank-display">
+          <span id="hud-rank-icon" aria-hidden="true">🛡️</span>
+          <span id="hud-rank">Cyber Novice</span>
+        </div>
+        <div class="xp-bar-track" role="progressbar"
+             aria-label="XP progress to next rank"
+             aria-valuemin="0" aria-valuemax="100">
+          <div class="xp-bar-fill" id="xp-bar-fill" style="width:0%"></div>
+        </div>
+        <div style="font-family:var(--font-ui); font-size:0.62rem; color:var(--text-muted); letter-spacing:0.12em;">
+          <span id="hud-xp">0</span>&nbsp;XP
+        </div>
+      </div>
+
+      <!-- Streak segment -->
+      <div class="hud-segment" aria-label="Answer streak">
+        <span class="hud-label">STREAK</span>
+        <div class="hud-streak-container">
+          <span class="streak-flame" aria-hidden="true">🔥</span>
+          <span class="hud-value" id="hud-streak">0</span>
+        </div>
+      </div>
+
+    </header>
+
+    <!-- Scenario progress bar -->
+    <div class="progress-bar-container" role="progressbar"
+         aria-label="Scenario progress" id="scenario-progress-bar">
+      <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      <span class="progress-text" id="progress-text" aria-live="polite">SCENARIO 1 / —</span>
+    </div>
+
+    <!-- Main game area -->
+    <div class="game-area">
+
+      <!-- SENTRY AI guidance panel -->
+      <div class="sentry-guidance-panel" role="note" aria-label="SENTRY guidance">
+        <span class="sentry-tag" aria-hidden="true">SENTRY &gt;</span>
+        <p id="sentry-message" aria-live="polite">Analysing threat profile...</p>
+      </div>
+
+      <!-- Scenario card -->
+      <article class="scenario-card" aria-label="Threat scenario">
+        <!-- Meta badges -->
+        <div class="scenario-meta" aria-label="Scenario details">
+          <span id="scenario-type-badge" class="type-badge" aria-label="Attack type">Phishing</span>
+          <span id="scenario-level" class="scenario-level" aria-label="Difficulty level">LVL 1</span>
+          <span id="scenario-occupation" class="scenario-occupation" aria-label="Target profile">STUDENT</span>
+        </div>
+
+        <!-- Divider -->
+        <hr style="border:none; border-top: 1px solid rgba(56,189,248,0.1); margin-bottom:16px;">
+
+        <!-- Scenario body text -->
+        <span class="scenario-prompt-label" aria-hidden="true">◈ THREAT SCENARIO DETECTED</span>
+        <p id="scenario-text" class="scenario-text" aria-live="polite">Loading scenario...</p>
+      </article>
+
+      <!-- Choices section -->
+      <div class="choices-section" aria-label="Response options">
+        <span class="choices-label" aria-hidden="true">◈ SELECT YOUR RESPONSE</span>
+        <div id="choices-container" class="choices-container" role="group"
+             aria-label="Response choices">
+          <!-- Choice buttons injected dynamically by script.js -->
+        </div>
+      </div>
+
+      <!-- Hint system -->
+      <div class="hint-section" aria-label="Hint system">
+        <button id="hint-btn" class="btn-hint" type="button"
+                aria-label="Reveal hint for a penalty of 5 XP"
+                aria-controls="hint-box"
+                aria-expanded="false">
+          💡 USE HINT  [ −5 XP ]
+        </button>
+
+        <div id="hint-box" class="hint-box hidden"
+             role="complementary" aria-label="SENTRY hint">
+          <span class="hint-icon" aria-hidden="true">💡</span>
+          <span id="hint-text" class="hint-text"></span>
+        </div>
+      </div>
+
+    </div><!-- /.game-area -->
+
+  </section><!-- /#screen-game -->
+
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SCREEN 4: FEEDBACK — RED FLAG ANALYSIS
+       Shows result, XP change, streak notification, breach
+       simulation (if wrong), and full Red Flag Analysis panel.
+  ═══════════════════════════════════════════════════════════════ -->
+  <section id="screen-feedback" class="screen" aria-label="Red Flag Analysis">
+
+    <div class="feedback-container">
+
+      <!-- Result banner: THREAT NEUTRALISED or THREAT SUCCEEDED -->
+      <div id="result-banner" class="result-banner correct" role="alert"
+           aria-live="assertive">
+        ✓  THREAT NEUTRALISED — CORRECT RESPONSE
+      </div>
+
+      <!-- Security breach simulation (wrong answers only) -->
+      <div id="breach-warning" class="breach-warning hidden"
+           role="alert" aria-live="polite" aria-atomic="true">
+        <div class="breach-header" aria-hidden="true">
+          ⚠ SECURITY BREACH SIMULATED
+        </div>
+        <p id="breach-details" class="breach-details">
+          Attacker gained access. Review the Red Flag Analysis below.
+        </p>
+      </div>
+
+      <!-- XP award/streak display -->
+      <div class="feedback-stats" aria-label="Performance metrics">
+        <div id="xp-change-display" class="xp-change positive"
+             aria-live="polite">+0 XP AWARDED</div>
+        <div id="streak-notification" class="streak-notification hidden"
+             aria-live="polite"></div>
+        <div id="correct-answer-display" class="correct-answer-display hidden"
+             aria-live="polite"></div>
+      </div>
+
+      <!-- ────────────────────────────────────────────────────────
+           RED FLAG ANALYSIS PANEL
+           Core learning component — explains the psychological
+           manipulation tactic (Cialdini, 2006) used in the attack.
+      ─────────────────────────────────────────────────────────── -->
+      <div class="red-flag-analysis terminal-window"
+           aria-label="Red Flag Analysis" role="complementary">
+
+        <div class="terminal-titlebar" aria-hidden="true">
+          <div class="terminal-dots">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+          </div>
+          <span class="terminal-title">RED FLAG ANALYSIS — SENTRY THREAT DEBRIEF</span>
+        </div>
+
+        <div class="rfa-header" aria-label="Attack classification">
+          <span class="rfa-title" aria-hidden="true">◈ THREAT DEBRIEF</span>
+          <span id="attack-type-display" class="attack-type-display"
+                aria-label="Attack type and difficulty">Phishing · Level 1</span>
+        </div>
+
+        <!-- Psychological principle badge -->
+        <div class="psych-principle-container" aria-label="Manipulation principle used">
+          <span class="psych-label">Manipulation Principle:</span>
+          <span id="psych-principle" class="psych-principle"
+                aria-live="polite">Authority + Urgency</span>
+        </div>
+
+        <!-- Full explanation -->
+        <div class="explanation-container">
+          <p id="red-flag-explanation" class="red-flag-explanation"
+             aria-live="polite">
+            Loading analysis...
+          </p>
+        </div>
+
+      </div><!-- /.red-flag-analysis -->
+
+      <!-- Next scenario button -->
+      <button id="next-btn" class="btn-primary" type="button"
+              aria-label="Proceed to next scenario">
+        PROCEED TO NEXT SCENARIO
+        <span class="btn-arrow" aria-hidden="true">▶</span>
+      </button>
+
+    </div><!-- /.feedback-container -->
+
+  </section><!-- /#screen-feedback -->
+
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SCREEN 5: SESSION COMPLETE
+       Shows final XP, achieved rank badge, accuracy stats,
+       and action buttons (Download Report, Play Again, Leaderboard).
+  ═══════════════════════════════════════════════════════════════ -->
+  <section id="screen-complete" class="screen" aria-label="Session complete">
+
+    <div class="complete-container">
+
+      <!-- Session complete header -->
+      <div class="complete-header">
+        <div style="font-family:var(--font-ui); font-size:0.7rem; color:var(--text-muted);
+                    letter-spacing:0.2em; text-transform:uppercase; margin-bottom:4px;">
+          ◈ TRAINING SESSION COMPLETE
+        </div>
+        <h2>DEBRIEF SUMMARY</h2>
+        <p class="complete-player-name" id="complete-player-name" aria-live="polite">
+          Mission complete.
+        </p>
+      </div>
+
+      <!-- Rank badge (large, animated reveal) -->
+      <div id="complete-rank-badge" class="rank-badge-large badge-novice"
+           role="img" aria-label="Rank badge achieved">
+        <span id="complete-rank-icon" aria-hidden="true">🛡️</span>
+        <span id="complete-rank-name"
+              style="font-size:0.65rem; text-align:center; line-height:1.3;">
+          Cyber Novice
+        </span>
+      </div>
+
+      <!-- Final XP -->
+      <div style="text-align:center;">
+        <div style="font-family:var(--font-terminal); font-size:3.2rem;
+                    color:var(--accent-blue); text-shadow:var(--glow-blue); line-height:1;">
+          <span id="complete-final-xp">0</span>&nbsp;XP
+        </div>
+        <div style="font-family:var(--font-ui); font-size:0.68rem; color:var(--text-muted);
+                    letter-spacing:0.15em; text-transform:uppercase; margin-top:4px;">
+          TOTAL EXPERIENCE POINTS
+        </div>
+      </div>
+
+      <!-- Rank description -->
+      <p id="complete-rank-desc" class="complete-rank-desc" aria-live="polite">
+        Session analysis complete.
+      </p>
+
+      <!-- Stats grid -->
+      <div class="complete-stats-grid" role="list" aria-label="Session statistics">
+
+        <div class="stat-box" role="listitem">
+          <div class="stat-value" id="complete-accuracy">0%</div>
+          <div class="stat-label">Accuracy</div>
+        </div>
+
+        <div class="stat-box" role="listitem">
+          <div class="stat-value" id="complete-scenarios">0</div>
+          <div class="stat-label">Scenarios</div>
+        </div>
+
+        <div class="stat-box" role="listitem">
+          <div class="stat-value" id="complete-mistakes" style="color:var(--accent-red);">0</div>
+          <div class="stat-label">Mistakes</div>
+        </div>
+
+        <div class="stat-box" role="listitem">
+          <div class="stat-value" id="complete-hints" style="color:var(--accent-amber);">0</div>
+          <div class="stat-label">Hints Used</div>
+        </div>
+
+        <div class="stat-box" role="listitem" style="grid-column: 1 / -1;">
+          <div class="stat-value" style="font-size:1.4rem; color:var(--accent-green);">
+            Nigeria 🇳🇬
+          </div>
+          <div class="stat-label">Threat Context</div>
+        </div>
+
+      </div><!-- /.complete-stats-grid -->
+
+      <!-- Action buttons -->
+      <div class="complete-actions" role="navigation" aria-label="Post-session actions">
+
+        <!-- Primary: Download Report -->
+        <button id="download-report-btn" class="btn-primary" type="button"
+                aria-label="Download session report as text file">
+          ⬇ DOWNLOAD SESSION REPORT
+        </button>
+
+        <div class="complete-actions-row">
+          <!-- Play Again -->
+          <button id="play-again-btn" class="btn-secondary" type="button"
+                  aria-label="Start a new training session">
+            ↺ PLAY AGAIN
+          </button>
+
+          <!-- View Leaderboard -->
+          <button id="leaderboard-btn" class="btn-secondary" type="button"
+                  aria-label="View local leaderboard">
+            🏆 LEADERBOARD
+          </button>
+        </div>
+
+      </div><!-- /.complete-actions -->
+
+      <!-- Academic footer -->
+      <footer style="text-align:center; margin-top: 8px;">
+        <p style="font-family:var(--font-ui); font-size:0.62rem; color:var(--text-muted);
+                  letter-spacing:0.08em; line-height:1.7;">
+          Social Engineering Awareness Game · Final Year Project<br>
+          Daniel Olubajo · Computer Science · SENTRY v1.0
+        </p>
+      </footer>
+
+    </div><!-- /.complete-container -->
+
+  </section><!-- /#screen-complete -->
+
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SCREEN 6: LOCAL LEADERBOARD
+       Shows top 5 session scores stored in localStorage.
+  ═══════════════════════════════════════════════════════════════ -->
+  <section id="screen-leaderboard" class="screen" aria-label="Leaderboard">
+
+    <div class="leaderboard-container">
+
+      <div class="leaderboard-header">
+        <div style="font-family:var(--font-ui); font-size:0.7rem; color:var(--text-muted);
+                    letter-spacing:0.2em; text-transform:uppercase;">
+          ◈ LOCAL RANKINGS — TOP 5 OPERATIVES
+        </div>
+        <h2>🏆 LEADERBOARD</h2>
+        <p>Scores are stored on this device. Complete a session to appear here.</p>
+      </div>
+
+      <!-- Leaderboard column headers -->
+      <div style="display:grid; grid-template-columns: 36px 1fr 1fr auto auto auto auto;
+                  gap:10px; padding: 6px 18px;
+                  font-family:var(--font-ui); font-size:0.6rem; font-weight:700;
+                  letter-spacing:0.15em; text-transform:uppercase;
+                  color:var(--text-muted); border-bottom:1px solid rgba(56,189,248,0.1);"
+           aria-hidden="true">
+        <span>#</span>
+        <span>Name</span>
+        <span>Occupation</span>
+        <span>Accuracy</span>
+        <span>XP</span>
+        <span>Rank</span>
+        <span>Date</span>
+      </div>
+
+      <!-- Leaderboard entries (populated by renderLeaderboard()) -->
+      <div id="leaderboard-entries" class="leaderboard-entries"
+           role="list" aria-label="Leaderboard entries" aria-live="polite">
+        <!-- Populated dynamically -->
+      </div>
+
+      <!-- Leaderboard actions -->
+      <div class="leaderboard-actions">
+        <button id="back-from-leaderboard-btn" class="btn-secondary" type="button"
+                aria-label="Return to session summary">
+          ← BACK TO SUMMARY
+        </button>
+        <button id="clear-leaderboard-btn" class="btn-danger" type="button"
+                aria-label="Clear all leaderboard data">
+          🗑 CLEAR BOARD
+        </button>
+      </div>
+
+    </div><!-- /.leaderboard-container -->
+
+  </section><!-- /#screen-leaderboard -->
+
+
+  <!--
+  ══════════════════════════════════════════════════════════════
+  SCRIPTS
+  Load order is critical:
+    1. data_fallback.js  — must be loaded first (defines FALLBACK_SCENARIOS)
+    2. script.js         — game engine (references FALLBACK_SCENARIOS)
+  ══════════════════════════════════════════════════════════════
+  -->
+  <!-- Bundled: data_fallback.js -->
+  <script>
+/**
+ * ============================================================
+ * Social Engineering Awareness Game (SEAG) — Fallback Dataset
+ * Project:    Social Engineering Awareness Training Game
+ * Author:     Daniel Olubajo
+ * File:       data_fallback.js
+ * Purpose:    Hardcoded scenario data for offline / demo mode.
+ *             This mirrors the Google Sheet CSV structure exactly.
+ *             All scenarios are localised for a Nigerian context
+ *             and categorised by occupation, attack type, and
+ *             psychological manipulation principle (Cialdini, 2006).
+ *
+ * Usage:      Automatically loaded by script.js when the Google
+ *             Sheets CSV fetch fails or the Sheet ID is not set.
+ * ============================================================
+ */
+
+/**
+ * @typedef {Object} Scenario
+ * @property {number}   id             - Unique scenario identifier
+ * @property {string}   scenario       - The scenario description shown to the player
+ * @property {string[]} options        - Array of response choices
+ * @property {string}   correctAnswer  - The text of the correct choice
+ * @property {string}   type           - Attack vector: Phishing|Vishing|Smishing|Baiting|Pretexting
+ * @property {string}   occupation     - Target occupation category
+ * @property {string}   level          - Difficulty: '1' | '2' | '3'
+ * @property {string}   hint           - Pedagogical clue (costs XP to reveal)
+ * @property {string}   explanation    - Red Flag Analysis explanation text
+ * @property {string}   psychPrinciple - Cialdini / manipulation principle(s) used
+ */
+
+/** @type {Scenario[]} */
+const FALLBACK_SCENARIOS = [
+
+  // ═══════════════════════════════════════════════════════════
+  //  STUDENT SCENARIOS  (5 scenarios, Levels 1–3)
+  // ═══════════════════════════════════════════════════════════
+
+  {
+    id: 1,
+    scenario:
+      "You receive an email from 'jamb.gov.ng-registration.com' stating that your UTME result has been withheld pending verification. The email says you must log in via the link and confirm your NIN within 24 hours or your admission will be permanently cancelled.",
+    options: [
+      "Click the link and enter your NIN immediately",
+      "Ignore the email completely",
+      "Go directly to jamb.gov.ng in your browser to verify the claim"
+    ],
+    correctAnswer: "Go directly to jamb.gov.ng in your browser to verify the claim",
+    type: "Phishing",
+    occupation: "Student",
+    level: "1",
+    hint:
+      "Compare the domain in the email: 'jamb.gov.ng-registration.com' is NOT the same as the official 'jamb.gov.ng'. Attackers register lookalike domains to deceive you.",
+    explanation:
+      "This is a phishing attack exploiting Authority (JAMB as a trusted government body) and Urgency (24-hour deadline). The attacker registered a lookalike domain to harvest your NIN. Official government portals NEVER communicate admission decisions through email links. Always type the official URL directly into your browser — never follow email links to government portals.",
+    psychPrinciple: "Authority + Urgency"
+  },
+
+  {
+    id: 2,
+    scenario:
+      "You receive an SMS: 'Congratulations! You have been selected for a ₦500,000 government scholarship. Reply with your full name, school name, matric number, and BVN to claim your award before midnight tonight.' The sender number shows as +234-813-0000-001.",
+    options: [
+      "Reply immediately with all the requested details before midnight",
+      "Forward to fellow students who might also qualify",
+      "Delete the SMS and report the number to your institution's cybersecurity desk"
+    ],
+    correctAnswer: "Delete the SMS and report the number to your institution's cybersecurity desk",
+    type: "Smishing",
+    occupation: "Student",
+    level: "1",
+    hint:
+      "Legitimate scholarship bodies NEVER request your BVN via SMS. Your BVN is a master key to your banking — sharing it with a stranger is equivalent to handing them your ATM card and PIN.",
+    explanation:
+      "This is a Smishing (SMS Phishing) attack using Scarcity ('before midnight') and an Appeal to Greed. No legitimate scholarship programme solicits BVN numbers through an unsolicited text. Sharing your BVN exposes you to SIM swaps, fraudulent bank transfers, and identity theft. Forwarding the message amplifies the scam to other potential victims.",
+    psychPrinciple: "Scarcity + Greed"
+  },
+
+  {
+    id: 3,
+    scenario:
+      "You find a USB drive on a desk near your university's computer lab. It is labelled 'FINAL EXAM ANSWERS 2025 — CONFIDENTIAL'. No one is around to claim it.",
+    options: [
+      "Plug it into the lab computer to see what files are on it",
+      "Take it home and plug it into your personal laptop where it is safer",
+      "Hand it in to the faculty office or security desk without plugging it in anywhere"
+    ],
+    correctAnswer: "Hand it in to the faculty office or security desk without plugging it in anywhere",
+    type: "Baiting",
+    occupation: "Student",
+    level: "2",
+    hint:
+      "The label is carefully designed to trigger your Curiosity. A USB drive is a physical attack vector — plugging it in can install malware (keyloggers, ransomware) in seconds, even before any file is opened.",
+    explanation:
+      "This is a classic Baiting attack. The attacker placed the USB device intentionally, leveraging your Curiosity about exam answers. Plugging in an unknown USB can silently install a Remote Access Trojan (RAT), keylogger, or ransomware. There is no 'safe' machine to test unknown USB devices — even personal laptops can be compromised. Always report found storage media to campus security.",
+    psychPrinciple: "Curiosity"
+  },
+
+  {
+    id: 4,
+    scenario:
+      "You receive a phone call: 'Good afternoon, I'm Officer Yusuf from NYSC Abuja Directorate. We have a critical error in your mobilisation file that will affect your posting. To correct it before today's deadline, I need your NYSC registration number, your state code, and your date of birth right now.' The caller ID on your screen shows 'NYSC'.",
+    options: [
+      "Provide all the information immediately to protect your mobilisation",
+      "Ask for his badge number, then hang up and call the official NYSC helpline independently to verify",
+      "Hang up — it's probably a prank call"
+    ],
+    correctAnswer: "Ask for his badge number, then hang up and call the official NYSC helpline independently to verify",
+    type: "Vishing",
+    occupation: "Student",
+    level: "2",
+    hint:
+      "Caller ID can be spoofed using free VoIP tools. An attacker can make their call appear to come from 'NYSC', 'CBN', or any institution. Always call back using a number you find yourself on the official website.",
+    explanation:
+      "This is Vishing (Voice Phishing) with Caller ID Spoofing. The attacker uses Authority (NYSC official) and Urgency (mobilisation deadline) to pressure you into disclosing data without verification. Caller ID spoofing is technically trivial. Offering to call back via an independently sourced number exposes the scammer — a legitimate official will always welcome verification.",
+    psychPrinciple: "Authority + Urgency"
+  },
+
+  {
+    id: 5,
+    scenario:
+      "You receive a WhatsApp message from an unknown number: 'Hi, it's Chidi from your 400-Level class. I'm at the hospital and my phone died — borrowing a friend's. Please send ₦15,000 urgently to this Opay number: 09012345678. I'll pay you back first thing tomorrow. It's very urgent, please.' You do not have Chidi saved in your contacts.",
+    options: [
+      "Send the money — a classmate is in distress and needs immediate help",
+      "Reply to the message asking for more details before sending",
+      "Reach Chidi through a mutual classmate or his known phone number before sending anything"
+    ],
+    correctAnswer: "Reach Chidi through a mutual classmate or his known phone number before sending anything",
+    type: "Pretexting",
+    occupation: "Student",
+    level: "3",
+    hint:
+      "Social engineers fabricate emergency stories specifically to bypass your rational thinking. 'Dead phone', 'hospital', and 'tomorrow payback' are classic Pretexting triggers. Always verify identity through a completely separate, trusted channel.",
+    explanation:
+      "This is a Pretexting attack. The attacker fabricated an emergency scenario using Social Proof (pretending to be a known classmate) and Fear (someone you care about is in danger). The unknown number and 'borrowed phone' are designed to explain why you can't recognise the contact. Always verify via a separate, independently confirmed channel — call a mutual friend — before any financial transaction.",
+    psychPrinciple: "Social Proof + Fear + Manufactured Urgency"
+  },
+
+
+  // ═══════════════════════════════════════════════════════════
+  //  IT PROFESSIONAL SCENARIOS  (5 scenarios, Levels 1–3)
+  // ═══════════════════════════════════════════════════════════
+
+  {
+    id: 6,
+    scenario:
+      "You receive an email marked HIGH PRIORITY from your CEO, Emeka Okonkwo: 'I am in an emergency board session in Lagos. You must transfer ₦2.5 million immediately to this vendor account for a contract payment: GTBank — 0123456789 — Zenith Corp Ltd. Do NOT discuss this with anyone until transfer is confirmed.' The sender email shows: emeka.okonkwo@yourcompany-support.com.",
+    options: [
+      "Execute the transfer immediately — the CEO has explicitly authorised it",
+      "Reply to the email requesting a formal purchase order",
+      "Call the CEO directly on his official, pre-saved number to verify before touching anything"
+    ],
+    correctAnswer: "Call the CEO directly on his official, pre-saved number to verify before touching anything",
+    type: "Phishing",
+    occupation: "IT Professional",
+    level: "2",
+    hint:
+      "The email domain 'yourcompany-support.com' is NOT your company's registered domain. This is Business Email Compromise (BEC) — one of the most financially costly cybercrimes globally. The 'do not discuss' instruction is a deliberate isolation tactic.",
+    explanation:
+      "This is a Business Email Compromise (BEC) / CEO Fraud attack. The attacker spoofed the CEO's name on a lookalike domain. Key red flags: lookalike domain, unusual payment channel, extreme urgency, and Secrecy ('do not discuss') — all designed to isolate you from colleagues who would spot the fraud. According to the FBI's IC3 report, BEC attacks caused over $2.9B in losses globally. Always verify financial instructions via a pre-saved phone number — never by replying to the suspicious email.",
+    psychPrinciple: "Authority + Urgency + Isolation / Secrecy"
+  },
+
+  {
+    id: 7,
+    scenario:
+      "You receive a phone call from someone claiming to be 'IT Support from Lagos HQ'. They say a critical zero-day vulnerability has been discovered and your machine is at immediate risk. They need your Windows admin credentials to remotely deploy an emergency security patch before close of business. 'If we don't patch this today, we could lose all company data.'",
+    options: [
+      "Provide the credentials — data loss is a critical business risk",
+      "Create a temporary account with admin rights just for this patch",
+      "Decline, raise a formal ticket through your helpdesk system, and escalate to your CISO"
+    ],
+    correctAnswer: "Decline, raise a formal ticket through your helpdesk system, and escalate to your CISO",
+    type: "Vishing",
+    occupation: "IT Professional",
+    level: "1",
+    hint:
+      "Legitimate IT security teams never ask for your personal credentials over a phone call. They use Privileged Access Management (PAM) tools, break-glass accounts, and change management tickets — not verbal credential collection.",
+    explanation:
+      "This is a Vishing attack targeting IT staff. The attacker exploits Fear (data loss) and Authority (headquarters IT). No legitimate enterprise IT process requires you to verbally disclose your personal credentials. Temporary accounts still create audit liability. Your helpdesk ticketing system creates a documented trail that would immediately expose an unauthorised 'patch' request.",
+    psychPrinciple: "Authority + Fear"
+  },
+
+  {
+    id: 8,
+    scenario:
+      "You and several colleagues receive an urgent email: 'Your Microsoft 365 licence will expire in 2 hours. Failure to renew will result in immediate loss of access to all company emails, OneDrive files, and Teams channels. Click RENEW NOW to prevent service disruption.' The link in the email leads to 'microsoft365-renewal-ng.com'.",
+    options: [
+      "Click the link quickly and renew before losing email access",
+      "Forward the email to all colleagues so everyone can renew",
+      "Log directly into portal.office.com and check the actual licence status in the admin console"
+    ],
+    correctAnswer: "Log directly into portal.office.com and check the actual licence status in the admin console",
+    type: "Phishing",
+    occupation: "IT Professional",
+    level: "1",
+    hint:
+      "Microsoft's renewal domain is microsoft.com, not 'microsoft365-renewal-ng.com'. The 2-hour deadline and 'colleagues also received it' detail are social engineering amplifiers — urgency plus social proof.",
+    explanation:
+      "This attack combines Urgency (2-hour deadline), Fear (losing access to business-critical tools), and Social Proof (colleagues also received it, creating a false sense of legitimacy). The lookalike domain harvests Microsoft 365 credentials. Forwarding would propagate the attack. As an IT professional, the admin portal is always the authoritative source of licence information.",
+    psychPrinciple: "Urgency + Fear + Social Proof"
+  },
+
+  {
+    id: 9,
+    scenario:
+      "You find a USB drive in your company's car park, near the entrance. It is labelled 'IT DEPT — SALARY REVIEW SPREADSHEET 2025 — CONFIDENTIAL — Do Not Distribute'.",
+    options: [
+      "Plug it into your work laptop in a sandboxed virtual machine to safely preview the file",
+      "Plug it into an isolated offline machine that is not connected to the network",
+      "Submit it to the security team as potential hostile hardware without plugging it in anywhere"
+    ],
+    correctAnswer: "Submit it to the security team as potential hostile hardware without plugging it in anywhere",
+    type: "Baiting",
+    occupation: "IT Professional",
+    level: "2",
+    hint:
+      "As an IT professional, you should know about BadUSB attacks — where the USB device firmware is reprogrammed to emulate a keyboard and inject keystrokes at the BIOS/OS level. Sandboxed VMs and isolated machines do not protect against BadUSB.",
+    explanation:
+      "This is a targeted Baiting attack against IT staff. The 'salary' label exploits both Curiosity and Self-Interest — two powerful cognitive triggers. BadUSB devices can emulate HIDs (keyboards/mice), inject commands at OS level, and even exfiltrate data through acoustic or power channels — making sandboxes and isolated machines ineffective defences. Your security team has forensic tools to safely analyse unknown hardware.",
+    psychPrinciple: "Curiosity + Self-Interest"
+  },
+
+  {
+    id: 10,
+    scenario:
+      "A LinkedIn recruiter sends you a message: 'Hi, I came across your profile and I think you are a great fit for a Senior DevSecOps role at a top Nigerian fintech paying ₦18M per annum plus equity. Please review the attached JD and complete a brief skills assessment at careers-fintechng.io/apply. Takes under 5 minutes.' You are not actively job hunting, but the package is attractive.",
+    options: [
+      "Complete the assessment — a ₦18M opportunity is worth 5 minutes",
+      "Thoroughly research the recruiter profile, company registration, and domain independently before engaging",
+      "Share the link with tech colleagues who might be interested"
+    ],
+    correctAnswer: "Thoroughly research the recruiter profile, company registration, and domain independently before engaging",
+    type: "Pretexting",
+    occupation: "IT Professional",
+    level: "3",
+    hint:
+      "Fake job offer attacks are well-documented. Check the recruiter's LinkedIn profile creation date, connection count, and endorsements. Verify the company on CAC (Corporate Affairs Commission). Check 'careers-fintechng.io' domain registration age — new domains (under 6 months) are a major red flag.",
+    explanation:
+      "This is a spear-phishing attack via social media, exploiting Greed (₦18M package) and Flattery ('great fit'). 'Skills assessment portals' are used by attackers to: harvest LinkedIn or GitHub OAuth tokens, deploy malicious JavaScript in the browser, or trick security professionals into installing 'assessment tools' that are Remote Access Trojans. Sharing amplifies the attack. Verify recruiter and company on official channels before clicking any external link.",
+    psychPrinciple: "Greed + Flattery"
+  },
+
+
+  // ═══════════════════════════════════════════════════════════
+  //  HEALTHCARE WORKER SCENARIOS  (5 scenarios, Levels 1–3)
+  // ═══════════════════════════════════════════════════════════
+
+  {
+    id: 11,
+    scenario:
+      "You receive an email that appears to be from the Federal Ministry of Health. It states that all registered healthcare workers must update their credentials on the NHIS portal by end of day or face immediate suspension. The email domain shows 'nhealth-ministry.gov.ng' and the update link points to 'nhis-update-portal.com.ng'.",
+    options: [
+      "Click the link and update your credentials immediately — suspension is a serious consequence",
+      "Forward to your hospital administrator so they can handle it officially",
+      "Navigate directly to nhis.gov.ng in your browser to verify whether this announcement exists"
+    ],
+    correctAnswer: "Navigate directly to nhis.gov.ng in your browser to verify whether this announcement exists",
+    type: "Phishing",
+    occupation: "Healthcare Worker",
+    level: "1",
+    hint:
+      "The official NHIS website is nhis.gov.ng. Both 'nhealth-ministry.gov.ng' (sender) and 'nhis-update-portal.com.ng' (link) are lookalike domains — neither is an official government domain. Government policy changes appear on official portals first.",
+    explanation:
+      "This phishing attack uses Authority (Federal Ministry of Health) and Urgency (suspension threat) to panic healthcare workers into clicking without verifying. In healthcare, compromised credentials can expose patient data and violate NDPR/HIPAA obligations, creating severe professional and legal consequences for the worker. Always verify healthcare regulatory announcements via your hospital's official communication channels or the agency's official website.",
+    psychPrinciple: "Authority + Urgency + Fear of Professional Consequences"
+  },
+
+  {
+    id: 12,
+    scenario:
+      "A caller identifies themselves: 'Good morning, I'm Dr. Biodun Adewale, Head of NHIS Compliance, Abuja. We are currently conducting an audit of your hospital and our records show a discrepancy in your personal NHIS staff registration. To correct this before our report is filed, I need your NIN, staff ID number, and date of birth. This will only take a moment.'",
+    options: [
+      "Provide the information — an audit discrepancy could affect your employment",
+      "Tell the caller you are willing to cooperate but will need to call NHIS Compliance directly first to confirm their identity",
+      "Transfer the call to your hospital's HR department to handle"
+    ],
+    correctAnswer: "Tell the caller you are willing to cooperate but will need to call NHIS Compliance directly first to confirm their identity",
+    type: "Vishing",
+    occupation: "Healthcare Worker",
+    level: "2",
+    hint:
+      "Legitimate government audit officers send official written notices — letters on ministry letterhead — before requesting personal information over the phone. Unsolicited calls demanding personal data, even from apparent officials, are a Vishing red flag.",
+    explanation:
+      "This Vishing attack uses Authority (NHIS Compliance officer) and Fear (audit discrepancy affecting employment) to create compliance under psychological pressure. Healthcare workers are high-value targets because stolen credentials can access hospital systems and millions of patient records. A legitimate auditor always welcomes identity verification — a fraudster will resist or create further urgency. Always call back on a number from the official NHIS website.",
+    psychPrinciple: "Authority + Fear of Professional Consequences"
+  },
+
+  {
+    id: 13,
+    scenario:
+      "You receive an SMS: 'NDPC URGENT ALERT: An unauthorised breach of patient records has been detected linked to your staff profile. Reply YES to verify your identity and begin the protection process. Case Ref: NDPC/2025/7741. Failure to verify within 60 mins may result in regulatory action.'",
+    options: [
+      "Reply YES immediately — patient data protection is your legal and professional responsibility",
+      "Contact your hospital's Data Protection Officer to report the SMS before taking any action",
+      "Ignore — it is likely spam"
+    ],
+    correctAnswer: "Contact your hospital's Data Protection Officer to report the SMS before taking any action",
+    type: "Smishing",
+    occupation: "Healthcare Worker",
+    level: "1",
+    hint:
+      "The Nigeria Data Protection Commission (NDPC) never sends compliance breach alerts via SMS with reply-to-verify instructions. Replying 'YES' confirms your number is active and may trigger further targeted attacks or premium SMS subscriptions.",
+    explanation:
+      "This Smishing attack exploits your professional sense of Responsibility and Fear of legal consequences under NDPR. The case reference number creates False Legitimacy. Replying confirms your number as active to the attacker. Regulatory bodies communicate through official correspondence — never unsolicited SMS messages. Your hospital's DPO is the correct escalation point for any data protection concern.",
+    psychPrinciple: "Professional Responsibility + Fear + False Legitimacy"
+  },
+
+  {
+    id: 14,
+    scenario:
+      "You receive a phone call claiming to be from MDCN (Medical and Dental Council of Nigeria): 'Doctor, our records show your medical practising licence is due for renewal and the window closes at 5pm today. To avoid automatic revocation and suspension from practice, you must pay ₦75,000 processing fee to: Access Bank — 0987654321 — MDCN Renewal Account. I can hold while you transfer.'",
+    options: [
+      "Make the payment immediately to protect your licence to practise",
+      "Ask the caller to email the payment details so you have a written record",
+      "Hang up and contact MDCN directly using the phone number listed on mdcn.gov.ng"
+    ],
+    correctAnswer: "Hang up and contact MDCN directly using the phone number listed on mdcn.gov.ng",
+    type: "Vishing",
+    occupation: "Healthcare Worker",
+    level: "2",
+    hint:
+      "MDCN renewal processes are published months in advance on their official website. Legitimate renewal deadlines are never communicated via unsolicited same-day phone calls. Asking for an email creates a paper trail that fraudsters avoid.",
+    explanation:
+      "This Vishing attack weaponises a healthcare professional's greatest fear: losing their licence to practise medicine. It combines Authority (MDCN officer), Urgency (5pm same-day deadline), and Fear of Career Destruction. MDCN licence renewal is a well-documented, multi-step process that is never compressed into a same-day phone call. The offer to 'hold while you transfer' is a pressure tactic to prevent you from independently verifying.",
+    psychPrinciple: "Authority + Urgency + Fear of Career Destruction"
+  },
+
+  {
+    id: 15,
+    scenario:
+      "You arrive for your morning shift at the hospital ward and find a USB drive on the nurses' station. It is labelled 'PATIENT RECORDS — WARD B — Q3 2025 — PRIVATE'. No one on the shift knows how it got there, and the ward computer might need the files it contains for patient care today.",
+    options: [
+      "Plug it into the ward computer to check if the files are needed for patient care",
+      "Lock it in a drawer to check later from your personal phone or laptop",
+      "Report it to the hospital IT/security desk and treat it as potentially hostile hardware"
+    ],
+    correctAnswer: "Report it to the hospital IT/security desk and treat it as potentially hostile hardware",
+    type: "Baiting",
+    occupation: "Healthcare Worker",
+    level: "3",
+    hint:
+      "Hospital networks are among the most targeted for ransomware globally. Plugging an unknown USB into any networked ward device could compromise patient monitoring systems, electronic prescribing systems, and radiology equipment — putting lives at risk.",
+    explanation:
+      "This Baiting attack is precisely engineered for a healthcare environment. The label exploits both your Curiosity and your professional Duty of Care to patients, framing inaction as potentially dangerous to patients. However, a single compromised USB on a networked hospital device could encrypt the entire hospital's electronic health record (EHR) system — a real pattern seen in NHS and Nigerian healthcare ransomware attacks. Unknown physical media is hostile until proven otherwise.",
+    psychPrinciple: "Curiosity + Duty of Care"
+  },
+
+
+  // ═══════════════════════════════════════════════════════════
+  //  GOVERNMENT EMPLOYEE SCENARIOS  (5 scenarios, Levels 1–3)
+  // ═══════════════════════════════════════════════════════════
+
+  {
+    id: 16,
+    scenario:
+      "You receive an email: 'URGENT — OFFICIAL EFCC NOTICE: Your name has been flagged in an ongoing money laundering investigation (Reference: EFCC/2025/ABJ/4421). You are required to submit a clearance statement by clicking the link below within 48 hours or face immediate arrest and asset forfeiture.' The sender is shown as: efcc-clearance@efcc-nigeria.net.",
+    options: [
+      "Click the link immediately — being investigated by the EFCC is an extremely serious matter",
+      "Forward to your ministry's legal department for urgent action",
+      "Do NOT click any link. Report the email to EFCC's official complaint line (complaints@efcc.gov.ng) and your ministry's IT security desk"
+    ],
+    correctAnswer: "Do NOT click any link. Report the email to EFCC's official complaint line (complaints@efcc.gov.ng) and your ministry's IT security desk",
+    type: "Phishing",
+    occupation: "Government Employee",
+    level: "1",
+    hint:
+      "The EFCC's official domain is efcc.gov.ng — note the .gov.ng suffix. 'efcc-nigeria.net' is a fraudulent lookalike domain. Official EFCC investigation notices are served via formal written correspondence or in person — never through email links.",
+    explanation:
+      "This is a high-anxiety phishing attack deliberately designed to override rational thinking through extreme Fear (arrest and asset forfeiture) and Authority (EFCC). The .net TLD vs .gov.ng is the critical red flag. EFCC and DSS do not conduct official investigation processes through email hyperlinks. The manufactured terror is the social engineering mechanism — it is designed to make you act before you verify.",
+    psychPrinciple: "Fear + Authority"
+  },
+
+  {
+    id: 17,
+    scenario:
+      "You receive an SMS: 'URGENT CBN/NIMC ALERT: Your National Identification Number (NIN) has been linked to suspicious financial activity. Your national identity will be SUSPENDED within 2 hours unless you verify at: nimc-verify.com. Act NOW to protect your identity.'",
+    options: [
+      "Visit the link immediately to prevent your NIN from being suspended",
+      "Call the official NIMC helpline (0800-800-0634) to verify whether any action is required",
+      "Forward the link to family members so they can also verify their NINs"
+    ],
+    correctAnswer: "Call the official NIMC helpline (0800-800-0634) to verify whether any action is required",
+    type: "Smishing",
+    occupation: "Government Employee",
+    level: "1",
+    hint:
+      "NIMC's official portal is nimc.gov.ng. 'nimc-verify.com' is not an official Nigerian government domain. NIMC does not send NIN suspension alerts via SMS with external verification links.",
+    explanation:
+      "This Smishing attack combines Fear (identity suspension) and Urgency (2 hours) by impersonating NIMC — a trusted government agency. As a government employee, your NIN is also linked to your IPPIS payroll profile. A compromised NIN can enable fraudulent civil service salary diversion, SIM swaps, and identity theft. NIMC communicates through its enrolment centres and official portal — never via unsolicited SMS.",
+    psychPrinciple: "Fear + Urgency"
+  },
+
+  {
+    id: 18,
+    scenario:
+      "A caller says: 'Good day, this is the IPPIS Helpdesk calling from the Office of the Accountant General of the Federation in Abuja. We have detected a system error in your payroll profile that will cause your salary to be withheld in the next pay cycle. To correct this today before our 4pm processing cutoff, I need to verify your IPPIS number, BVN, and date of birth.'",
+    options: [
+      "Provide the details quickly — missing a salary payment would be a serious problem",
+      "Provide only your IPPIS number but refuse to give your BVN or date of birth",
+      "Tell the caller you will call back on the official OAGF number from their website before providing any information"
+    ],
+    correctAnswer: "Tell the caller you will call back on the official OAGF number from their website before providing any information",
+    type: "Vishing",
+    occupation: "Government Employee",
+    level: "2",
+    hint:
+      "Providing 'partial' data is not a safe compromise. Your IPPIS number combined with your date of birth is sufficient to initiate fraudulent government benefit claims. Never provide ANY data to an unverified caller — even 'harmless' pieces.",
+    explanation:
+      "This Vishing attack exploits a government employee's Fear of salary disruption — a visceral, immediate threat. The 'partial information' trap is a classic social engineering tactic to make you feel cautious while still surrendering exploitable data. Legitimate OAGF payroll corrections are initiated through official memos and the IPPIS self-service portal — not unsolicited phone calls. Always call back on a number you find independently.",
+    psychPrinciple: "Fear + Urgency"
+  },
+
+  {
+    id: 19,
+    scenario:
+      "A well-dressed visitor approaches your desk at the ministry: 'Good morning. I am from the Department of State Services conducting a classified IT security audit of all government workstations. Please log into your computer so I can run a vulnerability scan. This is classified — please do not mention this to your colleagues or supervisor until my report is submitted.' He shows you what appears to be an official ID card.",
+    options: [
+      "Log in and allow the scan — the DSS has official authority over national security matters",
+      "Allow him access but stay close to monitor everything he does on the screen",
+      "Politely ask him to wait while you call your ministry's security officer to verify the audit and his identity"
+    ],
+    correctAnswer: "Politely ask him to wait while you call your ministry's security officer to verify the audit and his identity",
+    type: "Pretexting",
+    occupation: "Government Employee",
+    level: "2",
+    hint:
+      "ID cards can be forged cheaply and quickly. The 'do not mention to colleagues' instruction is a critical social engineering red flag — it is specifically designed to prevent you from verifying with people who would know about a legitimate audit. Authorised audits are announced through official channels before they occur.",
+    explanation:
+      "This is a physical Pretexting (social engineering in person) attack combining Authority (DSS), Secrecy ('don't tell colleagues' — which prevents you from verifying with your supervisor or colleagues who would know about a real audit), and Isolation. Allowing an unverified visitor to access a logged-in government workstation could compromise classified documents, install hardware keyloggers, or enable exfiltration of sensitive state data. A legitimate DSS officer will welcome and expect security verification procedures.",
+    psychPrinciple: "Authority + Secrecy + Isolation"
+  },
+
+  {
+    id: 20,
+    scenario:
+      "After a high-level ministry policy meeting concludes, you notice a USB drive left on one of the conference room chairs. It is labelled: 'DRAFT FEDERAL BUDGET PROPOSAL 2026 — RESTRICTED — NOT FOR CIRCULATION'. As the ministry's budget officer, this document would be directly relevant to your current work.",
+    options: [
+      "Plug it into your office computer to review — the budget data is relevant to your official duties",
+      "Hand it to your director as it may have been accidentally left by one of the meeting attendees",
+      "Submit it to the IT security desk as potentially hostile hardware without plugging it into any device"
+    ],
+    correctAnswer: "Submit it to the IT security desk as potentially hostile hardware without plugging it into any device",
+    type: "Baiting",
+    occupation: "Government Employee",
+    level: "3",
+    hint:
+      "The label is specifically tailored for a government finance environment to make the device feel 'professionally relevant' to you. Even handing it to your director without security clearance may result in it being plugged in, compromising the ministry network.",
+    explanation:
+      "This is a precision-targeted Baiting attack for government finance professionals. The label exploits your Professional Identity (this is your domain of responsibility) and Curiosity about sensitive budget data. Government budget systems are prime espionage and ransomware targets. A single compromised workstation can provide lateral access across the entire ministry's network infrastructure, potentially exposing classified financial data to external actors.",
+    psychPrinciple: "Curiosity + Professional Identity"
+  },
+
+
+  // ═══════════════════════════════════════════════════════════
+  //  GENERAL PUBLIC SCENARIOS  (5 scenarios, Levels 1–3)
+  // ═══════════════════════════════════════════════════════════
+
+  {
+    id: 21,
+    scenario:
+      "You receive an SMS: 'URGENT CBN ALERT: Your BVN 2234****99 has been linked to an unauthorised transaction. Your bank account will be FROZEN within 1 hour. Verify your identity immediately at: cbn-bvn-verify.com to restore access. Ignore at your own risk.'",
+    options: [
+      "Visit the verification link quickly — they already know your partial BVN, so the message must be legitimate",
+      "Call your bank's official customer care number (printed on the back of your debit card) to verify",
+      "Reply STOP to opt out of the alerts and avoid account freezing"
+    ],
+    correctAnswer: "Call your bank's official customer care number (printed on the back of your debit card) to verify",
+    type: "Smishing",
+    occupation: "General Public",
+    level: "1",
+    hint:
+      "Showing partial BVN digits is a deliberate False Legitimacy tactic. Attackers buy partial BVN data from breached datasets. The CBN never contacts individuals directly via SMS about account issues — it communicates through licensed banks.",
+    explanation:
+      "This sophisticated Smishing attack uses False Legitimacy (partial BVN display from a data breach), Urgency (1-hour account freeze), and Fear (lose access to your money). Seeing your partial BVN creates a false sense that the sender is authorised. Replying 'STOP' could confirm your number as active. CBN communicates with customers through licensed banks — your bank's customer care is the only correct escalation point.",
+    psychPrinciple: "False Legitimacy + Urgency + Fear"
+  },
+
+  {
+    id: 22,
+    scenario:
+      "You receive an SMS: '🎉 CONGRATULATIONS! You have WON ₦1,000,000 in the MTN Nigeria 40th Anniversary Promo! To process your winnings, please pay a ₦5,000 processing fee to: Opay — 09087654321 — MTN Promo Agent (Ade). Offer expires in 3 hours! Ref: MTN/WIN/4521.'",
+    options: [
+      "Send the ₦5,000 quickly before the 3-hour window closes — ₦1M is worth it",
+      "Call MTN customer care on 180 to verify if this promo is real before paying anything",
+      "Share the number in WhatsApp groups so friends and family can also claim their prizes"
+    ],
+    correctAnswer: "Call MTN customer care on 180 to verify if this promo is real before paying anything",
+    type: "Smishing",
+    occupation: "General Public",
+    level: "1",
+    hint:
+      "Legitimate prize winnings NEVER require you to pay a fee to collect. 'Pay to claim a prize' is the universal signature of Advance Fee Fraud. MTN official promos are always verifiable via their 180 helpline and official social media pages.",
+    explanation:
+      "This is an Advance Fee Fraud (419 scam) delivered via Smishing. It uses Greed (₦1M prize), Urgency (3-hour expiry), and False Legitimacy (promo reference number). The ₦5,000 'processing fee' will be collected and the 'prize' will never arrive — often followed by escalating demands for 'tax clearance', 'customs fees', etc. Sharing the link amplifies the scam to your entire social network.",
+    psychPrinciple: "Greed + Urgency + False Legitimacy"
+  },
+
+  {
+    id: 23,
+    scenario:
+      "You receive an email from 'security-alerts@gtb-onlinebanking.com': 'Dear Valued GTBank Customer, we have detected unusual login activity on your account from an unknown device. Your account has been temporarily limited for your protection. Click SECURE MY ACCOUNT below to restore full access within 24 hours before your account is permanently blocked.'",
+    options: [
+      "Click 'Secure My Account' immediately — someone may already be accessing your account",
+      "Log in to your GTBank account through the official GTBank app or by typing gtbank.com in your browser",
+      "Call the number provided in the email to speak with a GTBank agent"
+    ],
+    correctAnswer: "Log in to your GTBank account through the official GTBank app or by typing gtbank.com in your browser",
+    type: "Phishing",
+    occupation: "General Public",
+    level: "1",
+    hint:
+      "GTBank's official email domain is @gtbank.com. 'gtb-onlinebanking.com' is a fraudulent lookalike domain. Also: calling any number provided inside a suspicious email connects you directly to the attacker.",
+    explanation:
+      "This is one of the most common phishing attacks in Nigeria — bank email spoofing. The lookalike domain 'gtb-onlinebanking.com' mimics GTBank's branding. Clicking 'Secure My Account' redirects to a fake login page that steals your internet banking credentials. The Fear (account blocked) and Urgency (24 hours) drive panic. Calling the email's number would connect you to the attacker. Your bank's official app is always the safest way to verify account alerts.",
+    psychPrinciple: "Fear + Urgency + Authority Impersonation"
+  },
+
+  {
+    id: 24,
+    scenario:
+      "You receive a phone call: 'Good afternoon, this is the Access Bank Fraud Prevention Unit. We have just blocked a suspicious transfer of ₦250,000 from your account to an unknown recipient in Lagos. To confirm it was not you and to reverse the hold, I need to quickly verify your identity. Please provide your 16-digit ATM card number, expiry date, and the 3-digit CVV on the back.'",
+    options: [
+      "Provide all details quickly to reverse the fraudulent transfer and protect your money",
+      "Provide only your account number but not the CVV — that should be enough to verify",
+      "Tell the caller you will hang up and call Access Bank directly on 01-2802-900 to resolve this"
+    ],
+    correctAnswer: "Tell the caller you will hang up and call Access Bank directly on 01-2802-900 to resolve this",
+    type: "Vishing",
+    occupation: "General Public",
+    level: "2",
+    hint:
+      "Your bank will NEVER call you and ask for your CVV number. The CVV exists specifically to authenticate card-not-present transactions and is designed to be kept secret from everyone — including your bank.",
+    explanation:
+      "This Vishing attack creates Fear (₦250K leaving your account) and then positions the attacker as your protector, exploiting Reciprocity (they are 'helping' you, so you should help them verify). Providing 'partial' data (account number only) still puts you at risk — card number plus expiry date alone enables many online purchases. Banks categorically never ask for CVV numbers. Hang up and call the number printed on the back of your card.",
+    psychPrinciple: "Fear + Reciprocity"
+  },
+
+  {
+    id: 25,
+    scenario:
+      "You receive a WhatsApp message from a new, unknown contact: 'Good day, I am a representative of the Dangote Foundation. As part of our 2025 community empowerment programme, we are awarding ₦500,000 cash grants to 100 selected Nigerians this month. Your number was selected from our database. To process your grant, please provide your full name, Local Government Area, bank account number, and NIN. May God bless you and your household.'",
+    options: [
+      "Send the requested information — the Dangote Foundation is a legitimate, well-known charity",
+      "Visit the official Dangote Group website or their verified social media pages to confirm this grant programme",
+      "Forward the message to family members who may also benefit from the grant"
+    ],
+    correctAnswer: "Visit the official Dangote Group website or their verified social media pages to confirm this grant programme",
+    type: "Pretexting",
+    occupation: "General Public",
+    level: "3",
+    hint:
+      "Legitimate grant organisations publicise their programmes openly on verified official channels before collecting applications. They never solicit applications via unsolicited WhatsApp messages. Combining your bank account number and NIN enables identity theft, SIM swaps, and fraudulent mobile banking transactions.",
+    explanation:
+      "This Pretexting attack exploits Charitable Trust and Greed by impersonating a well-known Nigerian philanthropic institution. The 'God bless you' phrasing is a deliberate Religious Appeal designed to lower your psychological defences by creating an atmosphere of goodwill. Combining your bank account number, NIN, LGA, and full name enables SIM swap fraud, fraudulent USSD banking, and comprehensive identity theft. Verify any grant through official channels only — legitimate organisations will still be there after you verify.",
+    psychPrinciple: "Charitable Trust + Greed + Religious Appeal"
+  }
+
+]; // end FALLBACK_SCENARIOS
+
+  </script>
+
+  <!-- Bundled: script.js -->
+  <script>
+/**
+ * ============================================================
+ * Social Engineering Awareness Game (SEAG) — Core Game Engine
+ * Project:    Social Engineering Awareness Training Game
+ * Author:     Daniel Olubajo
+ * File:       script.js
+ * Version:    1.0.0
+ *
+ * Description:
+ *   This file is the complete game engine for the SEAG system.
+ *   It implements adaptive scenario delivery, XP/rank progression,
+ *   the hint system, Red Flag Analysis feedback, localStorage
+ *   persistence, local leaderboard, and session report download.
+ *
+ *   Theoretical basis: Constructivist Learning Theory (Vygotsky;
+ *   Bruner). Learners are not passive recipients — they investigate
+ *   threats, make decisions, receive immediate explanatory feedback,
+ *   and build mental models of attack patterns through iteration.
+ *
+ *   Data source priority:
+ *     1. Google Sheets CSV (via Fetch API)
+ *     2. FALLBACK_SCENARIOS (data_fallback.js) — offline/demo mode
+ *
+ * Dependencies:
+ *   - data_fallback.js (must be loaded before this file)
+ * ============================================================
+ */
+
+'use strict';
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  SECTION 1: CONFIGURATION CONSTANTS
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Google Sheets CSV URL.
+ * To configure: In Google Sheets → File → Share → Publish to web →
+ *   Select your sheet → Choose "Comma-separated values (.csv)" → Publish.
+ * Replace the placeholder below with the published URL.
+ */
+const GOOGLE_SHEET_CSV_URL =
+  'https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID_HERE/pub?gid=0&single=true&output=csv';
+
+/**
+ * XP awarded for a correct answer by difficulty level.
+ * Level 1 = basic awareness | Level 2 = intermediate | Level 3 = advanced
+ */
+const XP_PER_LEVEL = { '1': 10, '2': 15, '3': 20 };
+
+/** XP deducted each time the hint system is used. */
+const HINT_PENALTY = 5;
+
+/**
+ * Streak mechanic: correct answers in a row needed to award the streak bonus.
+ * Source: engagement design literature on variable reward schedules.
+ */
+const STREAK_THRESHOLD = 3;
+
+/** Bonus XP awarded upon reaching a streak milestone. */
+const STREAK_BONUS = 10;
+
+/**
+ * XP floor — the player's XP can never drop below this value.
+ * Prevents discouraging negative scores.
+ */
+const XP_FLOOR = 0;
+
+/**
+ * Rank progression table.
+ * Each rank has an XP threshold range, display name, CSS badge class, and icon.
+ * Ranks are checked in order — the first matching range wins.
+ */
+const RANKS = [
+  {
+    min: 0,
+    max: 99,
+    name: 'Cyber Novice',
+    badge: 'novice',
+    icon: '🛡️',
+    description: 'You are building foundational awareness. Keep training.'
+  },
+  {
+    min: 100,
+    max: 199,
+    name: 'Digital Defender',
+    badge: 'defender',
+    icon: '⚔️',
+    description: 'Solid threat recognition. Your vigilance is developing.'
+  },
+  {
+    min: 200,
+    max: Infinity,
+    name: 'Security Sentinel',
+    badge: 'sentinel',
+    icon: '🦅',
+    description: 'Outstanding situational awareness. You are a security asset.'
+  }
+];
+
+/**
+ * Occupation options matching the Google Sheet data.
+ * The cascading filter falls back to 'General Public' when fewer than
+ * MIN_SCENARIOS_THRESHOLD exact matches are found.
+ */
+const OCCUPATIONS = [
+  'Student',
+  'IT Professional',
+  'Healthcare Worker',
+  'Government Employee',
+  'General Public'
+];
+
+/** Minimum number of occupation-matched scenarios before cascade triggers. */
+const MIN_SCENARIOS_THRESHOLD = 3;
+
+/**
+ * SENTRY guidance messages, keyed by attack type.
+ * Displayed on the game screen to set the investigative framing.
+ */
+const SENTRY_GUIDANCE = {
+  'Phishing':   "A suspicious communication requires your analysis, Operative. Examine every element — the sender address, the urgency language, and the requested action.",
+  'Vishing':    "A voice-channel threat has been flagged. Remember — Caller ID can be spoofed. Verify identity independently before disclosing any information.",
+  'Smishing':   "Incoming SMS flagged for review. Analyse the sender, the urgency, the request, and any links before taking action.",
+  'Pretexting': "A fabricated identity or scenario is in play. Question the motive behind every claim. Why is this request being made? Why now?",
+  'Baiting':    "A physical or digital lure has been placed. Curiosity is a powerful cognitive bias that attackers exploit. Proceed with maximum caution."
+};
+
+/**
+ * Breach consequence messages displayed on the feedback screen after
+ * an incorrect answer, simulating the real-world outcome of the mistake.
+ */
+const BREACH_MESSAGES = {
+  'Phishing':   'Your credentials have been harvested. Unauthorised account access is now in progress.',
+  'Vishing':    'Sensitive personal information has been disclosed. Identity verification systems bypassed.',
+  'Smishing':   'Your personal data has been submitted to an attacker-controlled server. Account takeover imminent.',
+  'Pretexting': 'A false identity was trusted. Sensitive information or access has been surrendered.',
+  'Baiting':    'A malicious device has been connected. Silent infection is underway — your system is compromised.'
+};
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  SECTION 2: CENTRAL GAME STATE
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * The single source of truth for all game state.
+ * All game logic reads from and writes to this object.
+ * Key fields are persisted to localStorage for demo resilience.
+ *
+ * @type {Object}
+ */
+let GameState = {
+  playerName:         '',
+  playerAge:          '',
+  playerOccupation:   '',
+  allScenarios:       [],   // All scenarios loaded (CSV or fallback)
+  sessionScenarios:   [],   // Filtered + shuffled scenarios for this session
+  currentIndex:       0,
+  xp:                 0,
+  streak:             0,
+  mistakes:           [],   // { scenarioId, type, playerAnswer, correctAnswer }
+  hintsUsed:          0,
+  hintUsedThisRound:  false,
+  sessionComplete:    false,
+  currentPhase:       'boot'
+};
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  SECTION 3: BOOT SEQUENCE
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Terminal boot lines printed character-by-line during the boot animation.
+ * This serves as both a cinematic intro and a pedagogical framing device —
+ * establishing SENTRY as a professional-grade security system.
+ */
+const BOOT_LINES = [
+  '╔══════════════════════════════════════════════════╗',
+  '║     SENTRY SECURITY AWARENESS SYSTEM v1.0        ║',
+  '║     Social Engineering Training Platform         ║',
+  '╚══════════════════════════════════════════════════╝',
+  '',
+  '> Developed for academic research — Daniel Olubajo',
+  '> Final Year Project — Computer Science Department',
+  '',
+  '> [INIT] Establishing secure session...',
+  '> [OK]   Session encrypted.',
+  '> [INIT] Loading threat scenario database...',
+  '> [OK]   25 scenarios loaded.',
+  '> [INIT] Calibrating adaptive occupation filter...',
+  '> [OK]   Occupation engine ready (5 profiles).',
+  '> [INIT] Loading psychological attack pattern library...',
+  '> [OK]   Cialdini principles mapped (Authority, Urgency,',
+  '>         Scarcity, Social Proof, Fear, Reciprocity).',
+  '> [INIT] Activating SENTRY AI guidance module...',
+  '> [OK]   SENTRY online.',
+  '> [INIT] Verifying XP and rank progression engine...',
+  '> [OK]   Ranks: Novice → Defender → Sentinel.',
+  '',
+  '> ══════════════════════════════════════════════════',
+  '> ALL SYSTEMS OPERATIONAL.',
+  '> AWAITING OPERATIVE REGISTRATION...',
+  '> ▌'
+];
+
+/**
+ * Runs the cinematic boot sequence animation.
+ * Prints each line with a brief delay, then transitions to registration.
+ * Also triggers data loading during the animation.
+ *
+ * @returns {Promise<void>}
+ */
+async function runBootSequence() {
+  showScreen('boot');
+  const bootText = document.getElementById('boot-text');
+  bootText.innerHTML = '';
+
+  // Load scenario data concurrently while boot text animates
+  const dataPromise = loadScenarios();
+
+  for (const line of BOOT_LINES) {
+    await delay(90);
+    const lineEl = document.createElement('div');
+    lineEl.className = line.startsWith('╔') || line.startsWith('║') || line.startsWith('╚')
+      ? 'boot-line boot-border' : 'boot-line';
+    lineEl.textContent = line;
+    bootText.appendChild(lineEl);
+    bootText.scrollTop = bootText.scrollHeight;
+  }
+
+  // Ensure data loading completes before proceeding
+  await dataPromise;
+  await delay(1000);
+  showScreen('registration');
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  SECTION 4: DATA LOADING & CSV PARSING
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Attempts to load scenario data from the Google Sheet CSV.
+ * Falls back to FALLBACK_SCENARIOS if:
+ *   (a) The Sheet ID placeholder has not been replaced
+ *   (b) The network fetch fails (offline mode, CORS, timeout)
+ *   (c) The CSV response is malformed or empty
+ *
+ * @returns {Promise<void>}
+ */
+async function loadScenarios() {
+  if (GOOGLE_SHEET_CSV_URL.includes('YOUR_SHEET_ID_HERE')) {
+    console.info('[SENTRY] No Sheet ID configured — using built-in fallback dataset.');
+    GameState.allScenarios = FALLBACK_SCENARIOS;
+    return;
+  }
+
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000); // 8-second timeout
+
+    const response = await fetch(GOOGLE_SHEET_CSV_URL, {
+      cache: 'no-store',
+      signal: controller.signal
+    });
+    clearTimeout(timeout);
+
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    const csvText = await response.text();
+    const parsed = parseCSV(csvText);
+
+    if (parsed.length === 0) throw new Error('CSV parsed to 0 scenarios');
+
+    GameState.allScenarios = parsed;
+    console.info(`[SENTRY] Loaded ${parsed.length} scenarios from Google Sheets.`);
+
+  } catch (err) {
+    console.warn('[SENTRY] Google Sheets fetch failed — switching to fallback dataset.', err.message);
+    GameState.allScenarios = FALLBACK_SCENARIOS;
+  }
+}
+
+/**
+ * Parses a Google Sheets CSV export into an array of Scenario objects.
+ * Handles RFC 4180 quoted fields (fields containing commas, quotes, newlines).
+ *
+ * Expected CSV column headers (case-insensitive):
+ *   ID | Scenario | Options | CorrectAnswer | Type | Occupation |
+ *   Level | Hint | Explanation | PsychPrinciple
+ *
+ * Options column format: pipe-separated choices, e.g.
+ *   "Click the link|Ignore it|Verify through official site"
+ *
+ * @param {string} csvText - Raw CSV string
+ * @returns {Scenario[]} Array of parsed scenario objects
+ */
+function parseCSV(csvText) {
+  const rows = parseCSVRows(csvText);
+  if (rows.length < 2) {
+    console.warn('[SENTRY] CSV has fewer than 2 rows — cannot parse.');
+    return [];
+  }
+
+  const headers = rows[0].map(h => h.trim().toLowerCase().replace(/[\s_]+/g, ''));
+  const scenarios = [];
+
+  for (let i = 1; i < rows.length; i++) {
+    const row = rows[i];
+    if (row.every(cell => !cell.trim())) continue; // Skip empty rows
+
+    const obj = {};
+    headers.forEach((header, idx) => {
+      obj[header] = (row[idx] || '').trim();
+    });
+
+    // Validate required fields
+    if (!obj['scenario'] || !obj['correctanswer']) continue;
+
+    scenarios.push({
+      id:             parseInt(obj['id']) || (i),
+      scenario:       obj['scenario'],
+      options:        (obj['options'] || '').split('|').map(o => o.trim()).filter(Boolean),
+      correctAnswer:  obj['correctanswer'],
+      type:           obj['type'] || 'Phishing',
+      occupation:     obj['occupation'] || 'General Public',
+      level:          obj['level'] || '1',
+      hint:           obj['hint'] || 'Examine the communication carefully for inconsistencies.',
+      explanation:    obj['explanation'] || 'Refer to your training materials for more detail.',
+      psychPrinciple: obj['psychprinciple'] || obj['psychologicalprinciple'] || 'Manipulation Tactic'
+    });
+  }
+
+  return scenarios;
+}
+
+/**
+ * Parses a CSV string into a 2D array of string cells.
+ * Implements full RFC 4180 compliance for quoted fields.
+ *
+ * @param {string} str - Raw CSV string
+ * @returns {string[][]} 2D array where each inner array is one row
+ */
+function parseCSVRows(str) {
+  const rows = [];
+  let current = [], field = '', inQuote = false;
+
+  for (let i = 0; i < str.length; i++) {
+    const ch = str[i], next = str[i + 1];
+
+    if (inQuote) {
+      if (ch === '"' && next === '"') { field += '"'; i++; }      // Escaped quote
+      else if (ch === '"')             inQuote = false;            // End of quoted field
+      else                             field += ch;
+    } else {
+      if      (ch === '"')             inQuote = true;             // Start quoted field
+      else if (ch === ',')           { current.push(field); field = ''; }
+      else if (ch === '\n' || (ch === '\r' && next === '\n')) {
+        current.push(field); rows.push(current); current = []; field = '';
+        if (ch === '\r') i++;
+      }
+      else if (ch === '\r')          { current.push(field); rows.push(current); current = []; field = ''; }
+      else                             field += ch;
+    }
+  }
+  // Push final field/row
+  if (field !== '' || current.length > 0) { current.push(field); rows.push(current); }
+
+  return rows.filter(r => r.some(c => c.trim()));
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  SECTION 5: ADAPTIVE OCCUPATION FILTERING
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Filters and prepares the session scenario list using cascading logic.
+ *
+ * Algorithm:
+ *   Step 1: Collect all scenarios matching the player's occupation exactly.
+ *   Step 2: If count < MIN_SCENARIOS_THRESHOLD, supplement with 'General Public'
+ *           scenarios (avoiding duplicates) until the threshold is met.
+ *   Step 3: Shuffle the resulting array using Fisher-Yates (unbiased, uniform).
+ *
+ * This ensures every session has sufficient content regardless of how sparse
+ * any individual occupation category is in the data source.
+ *
+ * Adaptive design rationale (from project Chapter 2):
+ *   Occupation-specific scenarios increase perceived relevance, which is a
+ *   documented factor in security training effectiveness (Alshammari et al., 2015).
+ *
+ * @param {string} occupation - Player's chosen occupation
+ * @returns {Scenario[]} Filtered and shuffled scenario array for this session
+ */
+function filterScenariosByOccupation(occupation) {
+  const exactMatches = GameState.allScenarios.filter(s => s.occupation === occupation);
+  let sessionSet = [...exactMatches];
+
+  if (sessionSet.length < MIN_SCENARIOS_THRESHOLD) {
+    const generalPool = GameState.allScenarios.filter(
+      s => s.occupation === 'General Public' && !exactMatches.includes(s)
+    );
+    sessionSet = [...sessionSet, ...generalPool];
+    console.info(
+      `[SENTRY] Cascaded: ${exactMatches.length} exact + ${generalPool.length} General Public scenarios.`
+    );
+  }
+
+  return shuffleArray(sessionSet);
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  SECTION 6: REGISTRATION
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Validates the registration form inputs and initialises a new game session.
+ * Called when the player submits the registration form.
+ *
+ * Validation rules:
+ *   - Name: non-empty, minimum 2 characters
+ *   - Age:  integer between 10 and 100
+ *   - Occupation: must be selected from the dropdown
+ *
+ * On success: initialises GameState, filters scenarios, saves to localStorage,
+ * and transitions to the game screen.
+ */
+function handleRegistration() {
+  clearFormErrors();
+
+  const name = document.getElementById('reg-name').value.trim();
+  const age  = document.getElementById('reg-age').value.trim();
+  const occ  = document.getElementById('reg-occupation').value;
+
+  let valid = true;
+
+  if (!name || name.length < 2) {
+    showFormError('reg-name-error', '⚠ Please enter your full name (minimum 2 characters).');
+    valid = false;
+  }
+
+  const ageNum = parseInt(age, 10);
+  if (!age || isNaN(ageNum) || ageNum < 10 || ageNum > 100) {
+    showFormError('reg-age-error', '⚠ Please enter a valid age between 10 and 100.');
+    valid = false;
+  }
+
+  if (!occ) {
+    showFormError('reg-occ-error', '⚠ Please select your occupation profile.');
+    valid = false;
+  }
+
+  if (!valid) return;
+
+  // ── Initialise game state ──────────────────────────────────────────────────
+  GameState.playerName        = name;
+  GameState.playerAge         = ageNum;
+  GameState.playerOccupation  = occ;
+  GameState.sessionScenarios  = filterScenariosByOccupation(occ);
+  GameState.currentIndex      = 0;
+  GameState.xp                = 0;
+  GameState.streak             = 0;
+  GameState.mistakes          = [];
+  GameState.hintsUsed         = 0;
+  GameState.hintUsedThisRound = false;
+  GameState.sessionComplete   = false;
+
+  console.info(
+    `[SENTRY] Session started — Operative: ${name} | Occupation: ${occ} | ` +
+    `Scenarios queued: ${GameState.sessionScenarios.length}`
+  );
+
+  saveToLocalStorage();
+
+  // Transition to game
+  document.getElementById('hud-player').textContent = name.split(' ')[0].toUpperCase();
+  loadScenario();
+  showScreen('game');
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  SECTION 7: GAME SCREEN — SCENARIO LOADING
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Loads the current scenario into all game screen UI elements.
+ * Called on every new scenario (including after feedback).
+ *
+ * Populates:
+ *   - HUD (XP, rank, streak)
+ *   - SENTRY guidance message
+ *   - Scenario metadata badges (type, level, occupation)
+ *   - Scenario body text
+ *   - Choice buttons (dynamically generated)
+ *   - Progress bar and counter
+ *   - Hint button and hint box (reset)
+ */
+function loadScenario() {
+  const scenario = GameState.sessionScenarios[GameState.currentIndex];
+
+  if (!scenario) {
+    endGame();
+    return;
+  }
+
+  GameState.hintUsedThisRound = false;
+
+  // ── HUD ───────────────────────────────────────────────────────────────────
+  updateHUD();
+
+  // ── SENTRY guidance message ───────────────────────────────────────────────
+  const guidance = SENTRY_GUIDANCE[scenario.type]
+    || 'Operative, analyse this situation carefully before committing to a response.';
+  document.getElementById('sentry-message').textContent = guidance;
+
+  // ── Scenario metadata ─────────────────────────────────────────────────────
+  const typeBadge = document.getElementById('scenario-type-badge');
+  typeBadge.textContent = scenario.type;
+  typeBadge.className = `type-badge type-${scenario.type.toLowerCase().replace(/\s/g, '')}`;
+
+  document.getElementById('scenario-level').textContent     = `LVL ${scenario.level}`;
+  document.getElementById('scenario-occupation').textContent = scenario.occupation.toUpperCase();
+
+  // ── Scenario text ─────────────────────────────────────────────────────────
+  document.getElementById('scenario-text').textContent = scenario.scenario;
+
+  // ── Choice buttons ────────────────────────────────────────────────────────
+  const choicesContainer = document.getElementById('choices-container');
+  choicesContainer.innerHTML = '';
+  const letters = ['A', 'B', 'C', 'D'];
+
+  scenario.options.forEach((option, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.setAttribute('data-answer', option);
+    btn.innerHTML = `
+      <span class="choice-letter">${letters[idx]}</span>
+      <span class="choice-text">${option}</span>
+    `;
+    btn.addEventListener('click', () => handleChoice(option, scenario));
+    choicesContainer.appendChild(btn);
+  });
+
+  // ── Hint reset ────────────────────────────────────────────────────────────
+  const hintBox = document.getElementById('hint-box');
+  const hintBtn = document.getElementById('hint-btn');
+  hintBox.classList.add('hidden');
+  document.getElementById('hint-text').textContent = '';
+  hintBtn.disabled = false;
+  hintBtn.textContent = `💡 USE HINT  [ −${HINT_PENALTY} XP ]`;
+  hintBtn.classList.remove('used');
+
+  // ── Progress indicator ────────────────────────────────────────────────────
+  const total   = GameState.sessionScenarios.length;
+  const current = GameState.currentIndex + 1;
+  document.getElementById('progress-text').textContent = `SCENARIO ${current} / ${total}`;
+  const fillPct = (GameState.currentIndex / total) * 100;
+  document.getElementById('progress-fill').style.width = `${fillPct}%`;
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  SECTION 8: CHOICE HANDLING & XP CALCULATION
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Processes the player's choice selection.
+ *
+ * Logic flow:
+ *   1. Disable all choice buttons to prevent double-submission.
+ *   2. Apply correct/incorrect visual state to buttons.
+ *   3. If correct:
+ *      a. Award XP based on scenario level.
+ *      b. Increment streak counter.
+ *      c. If streak multiple of STREAK_THRESHOLD, award STREAK_BONUS XP.
+ *   4. If incorrect:
+ *      a. Reset streak to 0.
+ *      b. Record mistake in GameState.mistakes array.
+ *   5. Save state to localStorage.
+ *   6. After a 600ms visual feedback delay, show the feedback screen.
+ *
+ * @param {string} selectedAnswer - Text of the option the player clicked
+ * @param {Object} scenario       - Current scenario object
+ */
+function handleChoice(selectedAnswer, scenario) {
+  const isCorrect = selectedAnswer.trim() === scenario.correctAnswer.trim();
+
+  // Disable all buttons and highlight correct/selected
+  document.querySelectorAll('.choice-btn').forEach(btn => {
+    btn.disabled = true;
+    const answerText = btn.getAttribute('data-answer');
+
+    if (answerText === scenario.correctAnswer) {
+      btn.classList.add('correct');
+    }
+    if (answerText === selectedAnswer && !isCorrect) {
+      btn.classList.add('incorrect');
+    }
+  });
+
+  // ── XP calculation ────────────────────────────────────────────────────────
+  let xpGained   = 0;
+  let streakBonusAwarded = 0;
+
+  if (isCorrect) {
+    xpGained = XP_PER_LEVEL[scenario.level] || 10;
+    GameState.streak++;
+
+    // Check for streak bonus
+    if (GameState.streak > 0 && GameState.streak % STREAK_THRESHOLD === 0) {
+      streakBonusAwarded = STREAK_BONUS;
+      xpGained += streakBonusAwarded;
+    }
+
+    GameState.xp = Math.max(XP_FLOOR, GameState.xp + xpGained);
+
+  } else {
+    GameState.streak = 0;
+    GameState.mistakes.push({
+      scenarioId:    scenario.id,
+      type:          scenario.type,
+      playerAnswer:  selectedAnswer,
+      correctAnswer: scenario.correctAnswer
+    });
+  }
+
+  saveToLocalStorage();
+
+  // Brief visual pause before feedback screen
+  setTimeout(() => {
+    showFeedback(scenario, isCorrect, xpGained, streakBonusAwarded);
+  }, 700);
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  SECTION 9: HINT SYSTEM
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Reveals the pedagogical hint for the current scenario.
+ * Immediately deducts HINT_PENALTY XP (floored at XP_FLOOR).
+ * Can only be used once per scenario round.
+ *
+ * Constructivist design rationale:
+ *   The hint does not reveal the answer — it provides a cognitive scaffold
+ *   (Zone of Proximal Development, Vygotsky) that guides the learner's own
+ *   reasoning process. The XP cost models a meaningful trade-off decision.
+ */
+function useHint() {
+  if (GameState.hintUsedThisRound) return;
+
+  const scenario = GameState.sessionScenarios[GameState.currentIndex];
+  if (!scenario || !scenario.hint) return;
+
+  GameState.hintUsedThisRound = true;
+  GameState.hintsUsed++;
+
+  // Deduct XP immediately, respecting the XP floor
+  GameState.xp = Math.max(XP_FLOOR, GameState.xp - HINT_PENALTY);
+  updateHUD();
+
+  // Update hint button state
+  const hintBtn = document.getElementById('hint-btn');
+  hintBtn.disabled = true;
+  hintBtn.textContent = '💡 HINT USED';
+  hintBtn.classList.add('used');
+
+  // Reveal hint text
+  document.getElementById('hint-text').textContent = scenario.hint;
+  document.getElementById('hint-box').classList.remove('hidden');
+
+  saveToLocalStorage();
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  SECTION 10: FEEDBACK SCREEN — RED FLAG ANALYSIS
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Populates and displays the post-choice feedback screen.
+ *
+ * This is the core learning moment of the game (Constructivist principle:
+ * immediate, contextual feedback builds schema). The Red Flag Analysis:
+ *   - Names the psychological manipulation technique used (Cialdini, 2006)
+ *   - Explains HOW the attack works and WHY it is effective
+ *   - Does NOT merely state "that was wrong" — it explains the mechanism
+ *
+ * For incorrect answers, a "Security Breach Simulated" notice shows
+ * the plausible real-world consequence, reinforcing the stakes.
+ *
+ * @param {Scenario} scenario           - Current scenario
+ * @param {boolean}  isCorrect          - Whether the player chose correctly
+ * @param {number}   xpGained           - Total XP gained this round (0 if wrong)
+ * @param {number}   streakBonus        - Streak bonus component of xpGained
+ */
+function showFeedback(scenario, isCorrect, xpGained, streakBonus) {
+
+  // ── Result banner ─────────────────────────────────────────────────────────
+  const resultBanner = document.getElementById('result-banner');
+  if (isCorrect) {
+    resultBanner.textContent = '✓  THREAT NEUTRALISED — CORRECT RESPONSE';
+    resultBanner.className = 'result-banner correct';
+  } else {
+    resultBanner.textContent = '✗  THREAT SUCCEEDED — INCORRECT RESPONSE';
+    resultBanner.className = 'result-banner incorrect';
+  }
+
+  // ── Security breach simulation (incorrect only) ───────────────────────────
+  const breachWarning = document.getElementById('breach-warning');
+  if (!isCorrect) {
+    document.getElementById('breach-details').textContent =
+      BREACH_MESSAGES[scenario.type] || 'System security compromised.';
+    breachWarning.classList.remove('hidden');
+  } else {
+    breachWarning.classList.add('hidden');
+  }
+
+  // ── XP change display ─────────────────────────────────────────────────────
+  const xpEl = document.getElementById('xp-change-display');
+  if (isCorrect) {
+    let xpText = `+${xpGained} XP AWARDED`;
+    if (streakBonus > 0) xpText += ` (includes +${streakBonus} streak bonus)`;
+    xpEl.textContent = xpText;
+    xpEl.className = 'xp-change positive';
+  } else {
+    xpEl.textContent = 'NO XP AWARDED — THREAT BYPASSED';
+    xpEl.className = 'xp-change neutral';
+  }
+
+  // ── Streak notification ───────────────────────────────────────────────────
+  const streakEl = document.getElementById('streak-notification');
+  if (isCorrect && streakBonus > 0) {
+    streakEl.textContent = `🔥 ${GameState.streak}-ANSWER STREAK! +${streakBonus} BONUS XP AWARDED`;
+    streakEl.classList.remove('hidden');
+  } else {
+    streakEl.classList.add('hidden');
+  }
+
+  // ── Correct answer reveal (wrong answers only) ────────────────────────────
+  const correctEl = document.getElementById('correct-answer-display');
+  if (!isCorrect) {
+    correctEl.textContent = `✓ Correct response: "${scenario.correctAnswer}"`;
+    correctEl.classList.remove('hidden');
+  } else {
+    correctEl.classList.add('hidden');
+  }
+
+  // ── Red Flag Analysis ─────────────────────────────────────────────────────
+  document.getElementById('attack-type-display').textContent =
+    `Attack Vector: ${scenario.type}  |  Difficulty: Level ${scenario.level}`;
+
+  document.getElementById('psych-principle').textContent =
+    scenario.psychPrinciple || 'Psychological Manipulation';
+
+  document.getElementById('red-flag-explanation').textContent =
+    scenario.explanation;
+
+  showScreen('feedback');
+}
+
+/**
+ * Advances to the next scenario, or triggers game completion if all
+ * scenarios have been presented.
+ */
+function nextScenario() {
+  GameState.currentIndex++;
+
+  if (GameState.currentIndex >= GameState.sessionScenarios.length) {
+    endGame();
+  } else {
+    loadScenario();
+    showScreen('game');
+  }
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  SECTION 11: GAME COMPLETION
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Handles the end-of-session state.
+ * Calculates final statistics, updates the local leaderboard,
+ * populates the completion screen, and transitions to it.
+ */
+function endGame() {
+  GameState.sessionComplete = true;
+
+  const rank     = getRankByXP(GameState.xp);
+  const accuracy = calculateAccuracy();
+
+  // ── Populate completion screen ────────────────────────────────────────────
+  document.getElementById('complete-player-name').textContent =
+    `Well done, ${GameState.playerName}.`;
+  document.getElementById('complete-final-xp').textContent = GameState.xp;
+  document.getElementById('complete-rank-name').textContent = rank.name;
+  document.getElementById('complete-rank-icon').textContent = rank.icon;
+  document.getElementById('complete-rank-desc').textContent = rank.description;
+  document.getElementById('complete-accuracy').textContent  = `${accuracy}%`;
+  document.getElementById('complete-mistakes').textContent  = GameState.mistakes.length;
+  document.getElementById('complete-hints').textContent     = GameState.hintsUsed;
+  document.getElementById('complete-scenarios').textContent = GameState.sessionScenarios.length;
+
+  // Rank badge styling
+  const badgeEl = document.getElementById('complete-rank-badge');
+  badgeEl.className = `rank-badge-large badge-${rank.badge}`;
+
+  // ── Update leaderboard ────────────────────────────────────────────────────
+  addToLeaderboard({
+    name:       GameState.playerName,
+    xp:         GameState.xp,
+    rank:       rank.name,
+    occupation: GameState.playerOccupation,
+    accuracy:   accuracy,
+    date:       new Date().toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' })
+  });
+
+  showScreen('complete');
+}
+
+/**
+ * Calculates session accuracy as a percentage.
+ * @returns {number} Accuracy percentage (0–100)
+ */
+function calculateAccuracy() {
+  const total   = GameState.sessionScenarios.length;
+  if (total === 0) return 0;
+  const correct = total - GameState.mistakes.length;
+  return Math.round((correct / total) * 100);
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  SECTION 12: XP & RANK UTILITIES
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Returns the rank object for the given XP total.
+ * @param {number} xp - Current XP value
+ * @returns {Object} Rank object (min, max, name, badge, icon, description)
+ */
+function getRankByXP(xp) {
+  for (const rank of RANKS) {
+    if (xp >= rank.min && xp <= rank.max) return rank;
+  }
+  return RANKS[RANKS.length - 1]; // Default to highest rank
+}
+
+/**
+ * Updates all HUD elements to reflect the current GameState.
+ * Called after any XP change (correct answer, hint use, streak bonus).
+ */
+function updateHUD() {
+  const rank = getRankByXP(GameState.xp);
+
+  document.getElementById('hud-xp').textContent         = GameState.xp;
+  document.getElementById('hud-rank').textContent        = rank.name;
+  document.getElementById('hud-rank-icon').textContent   = rank.icon;
+  document.getElementById('hud-streak').textContent      = GameState.streak;
+
+  // XP progress bar within the current rank range
+  const currentRankMin = rank.min;
+  const nextRankMin    = RANKS.find(r => r.min > GameState.xp)?.min ?? (rank.max + 1);
+  const rangeSize      = nextRankMin - currentRankMin;
+  const progress       = rangeSize > 0 ? ((GameState.xp - currentRankMin) / rangeSize) * 100 : 100;
+
+  document.getElementById('xp-bar-fill').style.width = `${Math.min(100, progress)}%`;
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  SECTION 13: LEADERBOARD
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Adds a new entry to the local leaderboard in localStorage.
+ * Maintains only the top 5 entries sorted by XP descending.
+ *
+ * @param {Object} entry - { name, xp, rank, occupation, accuracy, date }
+ */
+function addToLeaderboard(entry) {
+  const board = getLeaderboard();
+  board.push(entry);
+  board.sort((a, b) => b.xp - a.xp);
+  const top5 = board.slice(0, 5);
+  try {
+    localStorage.setItem('seag_leaderboard_v1', JSON.stringify(top5));
+  } catch (e) {
+    console.warn('[SENTRY] localStorage write failed for leaderboard.', e);
+  }
+}
+
+/**
+ * Retrieves the leaderboard array from localStorage.
+ * Returns an empty array if no data exists or if parsing fails.
+ * @returns {Object[]} Leaderboard entries
+ */
+function getLeaderboard() {
+  try {
+    return JSON.parse(localStorage.getItem('seag_leaderboard_v1') || '[]');
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Renders the leaderboard screen with the current top-5 entries.
+ * Transitions to the leaderboard screen after rendering.
+ */
+function renderLeaderboard() {
+  const board     = getLeaderboard();
+  const container = document.getElementById('leaderboard-entries');
+  container.innerHTML = '';
+
+  if (board.length === 0) {
+    container.innerHTML =
+      '<div class="lb-empty">[ NO ENTRIES YET ] Complete a training session to appear on the leaderboard.</div>';
+    showScreen('leaderboard');
+    return;
+  }
+
+  const medals = ['🥇', '🥈', '🥉', '4.', '5.'];
+
+  board.forEach((entry, idx) => {
+    const div = document.createElement('div');
+    div.className = `lb-entry ${idx === 0 ? 'lb-top' : ''}`;
+    div.innerHTML = `
+      <span class="lb-pos">${medals[idx] || (idx + 1) + '.'}</span>
+      <span class="lb-name">${escapeHTML(entry.name)}</span>
+      <span class="lb-occ">${escapeHTML(entry.occupation)}</span>
+      <span class="lb-accuracy">${entry.accuracy ?? '—'}%</span>
+      <span class="lb-xp">${entry.xp} XP</span>
+      <span class="lb-rank-name">${escapeHTML(entry.rank)}</span>
+      <span class="lb-date">${escapeHTML(entry.date)}</span>
+    `;
+    container.appendChild(div);
+  });
+
+  showScreen('leaderboard');
+}
+
+/**
+ * Clears all leaderboard data from localStorage.
+ * Useful for demo resets.
+ */
+function clearLeaderboard() {
+  localStorage.removeItem('seag_leaderboard_v1');
+  renderLeaderboard();
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  SECTION 14: REPORT DOWNLOAD
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Generates and downloads a plain-text session report.
+ *
+ * The report serves as academic evidence of system functionality and
+ * player performance. It is suitable for inclusion in a project appendix
+ * or for supervisor demonstration.
+ *
+ * Format: UTF-8 plain text (.txt), downloaded via Blob URL.
+ * Filename convention: SEAG_Report_{PlayerName}_{Date}.txt
+ */
+function downloadReport() {
+  const rank     = getRankByXP(GameState.xp);
+  const accuracy = calculateAccuracy();
+  const now      = new Date();
+
+  const separator = '═'.repeat(62);
+  const divider   = '─'.repeat(62);
+
+  let report = `
+${separator}
+   SOCIAL ENGINEERING AWARENESS GAME — SESSION REPORT
+           SENTRY System v1.0 | Academic Edition
+${separator}
+
+OPERATIVE PROFILE
+${divider}
+  Full Name   :  ${GameState.playerName}
+  Age         :  ${GameState.playerAge}
+  Occupation  :  ${GameState.playerOccupation}
+  Session Date:  ${now.toLocaleDateString('en-GB', { weekday:'long', day:'2-digit', month:'long', year:'numeric' })}
+  Session Time:  ${now.toLocaleTimeString('en-GB')}
+
+SESSION PERFORMANCE
+${divider}
+  Final XP        :  ${GameState.xp}
+  Rank Achieved   :  ${rank.icon} ${rank.name}
+  Accuracy        :  ${accuracy}%
+  Total Scenarios :  ${GameState.sessionScenarios.length}
+  Correct         :  ${GameState.sessionScenarios.length - GameState.mistakes.length}
+  Mistakes        :  ${GameState.mistakes.length}
+  Hints Used      :  ${GameState.hintsUsed}
+
+RANK PROGRESSION REFERENCE
+${divider}
+  🛡️  Cyber Novice      →   0 –  99 XP  (Building foundational awareness)
+  ⚔️  Digital Defender  → 100 – 199 XP  (Developing threat recognition)
+  🦅  Security Sentinel → 200+    XP  (Advanced situational awareness)
+`;
+
+  if (GameState.mistakes.length === 0) {
+    report += `
+MISTAKE LOG
+${divider}
+  ✓ PERFECT SESSION — No mistakes recorded.
+    Outstanding threat identification across all scenarios.
+`;
+  } else {
+    report += `
+MISTAKE LOG  (${GameState.mistakes.length} error(s) — Review these attack vectors)
+${divider}`;
+    GameState.mistakes.forEach((m, i) => {
+      report += `
+  [${i + 1}]  Scenario ID  :  #${m.scenarioId}
+       Attack Type  :  ${m.type}
+       Your Answer  :  ${m.playerAnswer}
+       Correct Resp :  ${m.correctAnswer}
+`;
+    });
+  }
+
+  report += `
+ACADEMIC CONTEXT
+${divider}
+  This report was generated by the Social Engineering Awareness Game,
+  a final-year Computer Science project implementing Constructivist
+  Learning Theory (Vygotsky; Bruner) through adaptive gamified training.
+
+  The game presents Nigerian-contextualised social engineering scenarios
+  (Phishing, Vishing, Smishing, Baiting, Pretexting) drawn from real-
+  world attack patterns documented in cybersecurity literature.
+
+  Psychological principles modelled: Authority, Urgency, Scarcity,
+  Social Proof, Fear, Reciprocity, False Legitimacy (Cialdini, 2006).
+
+${separator}
+Generated by SENTRY Social Engineering Awareness Game
+Project Author: Daniel Olubajo | Final Year Project
+${separator}
+`;
+
+  const blob = new Blob([report.trimStart()], { type: 'text/plain;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `SEAG_Report_${GameState.playerName.replace(/\s+/g, '_')}_${now.toISOString().slice(0,10)}.txt`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  SECTION 15: SCREEN MANAGEMENT
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Shows the target screen and hides all others.
+ * All screens must have the class 'screen' and id format 'screen-{screenId}'.
+ *
+ * @param {string} screenId - Target screen identifier
+ *   Valid values: 'boot' | 'registration' | 'game' | 'feedback' | 'complete' | 'leaderboard'
+ */
+function showScreen(screenId) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const target = document.getElementById(`screen-${screenId}`);
+  if (target) {
+    target.classList.add('active');
+    // Scroll to top of screen on transition
+    target.scrollTop = 0;
+    window.scrollTo(0, 0);
+  }
+  GameState.currentPhase = screenId;
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  SECTION 16: LOCALSTORAGE PERSISTENCE
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Saves a snapshot of the critical game state to localStorage.
+ * Allows the session to survive a page refresh during demo.
+ *
+ * Note: sessionScenarios and allScenarios are NOT persisted —
+ * they are large objects that would bloat localStorage and can
+ * be reconstructed on re-load.
+ */
+function saveToLocalStorage() {
+  const snapshot = {
+    playerName:       GameState.playerName,
+    playerAge:        GameState.playerAge,
+    playerOccupation: GameState.playerOccupation,
+    currentIndex:     GameState.currentIndex,
+    xp:               GameState.xp,
+    streak:           GameState.streak,
+    mistakes:         GameState.mistakes,
+    hintsUsed:        GameState.hintsUsed
+  };
+  try {
+    localStorage.setItem('seag_session_v1', JSON.stringify(snapshot));
+  } catch (e) {
+    console.warn('[SENTRY] localStorage write failed.', e);
+  }
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  SECTION 17: UTILITY FUNCTIONS
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Returns a promise that resolves after the specified delay.
+ * Used for timing in async animations and transitions.
+ *
+ * @param {number} ms - Milliseconds to wait
+ * @returns {Promise<void>}
+ */
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+/**
+ * Fisher-Yates shuffle algorithm.
+ * Creates a new shuffled array without mutating the original.
+ * Used to randomise scenario order each session (prevents memorisation).
+ *
+ * @param {any[]} arr - Array to shuffle
+ * @returns {any[]} New shuffled array
+ */
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/**
+ * Displays a validation error message under a form field.
+ * @param {string} elementId - ID of the error <span> element
+ * @param {string} message   - Error message text
+ */
+function showFormError(elementId, message) {
+  const el = document.getElementById(elementId);
+  if (el) {
+    el.textContent = message;
+    el.classList.remove('hidden');
+  }
+}
+
+/** Hides and clears all form error messages. */
+function clearFormErrors() {
+  document.querySelectorAll('.form-error').forEach(el => {
+    el.textContent = '';
+    el.classList.add('hidden');
+  });
+}
+
+/**
+ * Basic HTML escaping to prevent XSS when inserting dynamic content.
+ * @param {string} str - Raw string to escape
+ * @returns {string} HTML-safe string
+ */
+function escapeHTML(str) {
+  if (typeof str !== 'string') return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  SECTION 18: EVENT LISTENERS & INITIALISATION
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Attaches all event listeners once the DOM is fully loaded.
+ * All user interaction is event-driven — no inline HTML handlers.
+ */
+document.addEventListener('DOMContentLoaded', () => {
+
+  // ── Registration ──────────────────────────────────────────────────────────
+  document.getElementById('reg-submit').addEventListener('click', handleRegistration);
+
+  // Allow Enter key to submit registration
+  ['reg-name', 'reg-age', 'reg-occupation'].forEach(id => {
+    document.getElementById(id)?.addEventListener('keydown', e => {
+      if (e.key === 'Enter') handleRegistration();
+    });
+  });
+
+  // ── Game screen ───────────────────────────────────────────────────────────
+  document.getElementById('hint-btn').addEventListener('click', useHint);
+
+  // ── Feedback screen ───────────────────────────────────────────────────────
+  document.getElementById('next-btn').addEventListener('click', nextScenario);
+
+  // ── Completion screen ─────────────────────────────────────────────────────
+  document.getElementById('download-report-btn').addEventListener('click', downloadReport);
+  document.getElementById('play-again-btn').addEventListener('click', () => {
+    showScreen('registration');
+  });
+  document.getElementById('leaderboard-btn').addEventListener('click', renderLeaderboard);
+
+  // ── Leaderboard screen ────────────────────────────────────────────────────
+  document.getElementById('back-from-leaderboard-btn').addEventListener('click', () => {
+    showScreen('complete');
+  });
+  document.getElementById('clear-leaderboard-btn')?.addEventListener('click', () => {
+    if (confirm('Clear all leaderboard data?')) clearLeaderboard();
+  });
+
+  // ── Start ─────────────────────────────────────────────────────────────────
+  runBootSequence();
+});
+
+  </script>
+
+</body>
+</html>

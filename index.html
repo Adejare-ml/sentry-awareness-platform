@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!--
+  ============================================================
+  Social Engineering Awareness Game (SEAG) v2.0
+  Project:  Social Engineering Awareness Training Game
+  Author:   Daniel Olubajo
+  File:     index.html
+  Version:  2.0.0
+
+  Dataset:  1,635 scenarios · 10 series · 3 tiers · 5 occupations
+  Stack:    HTML5 · CSS3 · Vanilla JS · Google Sheets CSV / Fetch API
+  Fonts:    VT323 · Share Tech Mono · Rajdhani (Google Fonts)
+  Deploy:   GitHub Pages · Cloudflare Pages · Vercel · Render
+  ============================================================
+  -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="SENTRY v2.0 — Social Engineering Awareness Training Game. 1,635 Nigerian-contextualised scenarios across 10 thematic series and 3 difficulty tiers.">
+  <meta name="author" content="Daniel Olubajo">
+  <meta property="og:title"       content="SENTRY v2.0 — Social Engineering Awareness Game">
+  <meta property="og:description" content="1,635 adaptive scenarios across 10 series. Train your threat detection skills now.">
+  <meta property="og:type"        content="website">
+
+  <title>SENTRY v2.0 — Social Engineering Awareness Game</title>
+
+  <!-- Favicon: inline SVG shield -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2L4 7v9c0 7.5 5.2 14.4 12 16.5C22.8 30.4 28 23.5 28 16V7L16 2z' fill='%230f172a' stroke='%2338bdf8' stroke-width='1.5'/%3E%3Cpath d='M12 16l3 3 5-5' stroke='%2322c55e' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- CRT scanlines overlay -->
+  <div class="scanlines" aria-hidden="true"></div>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       SCREEN 1 — BOOT SEQUENCE
+  ═══════════════════════════════════════════════════════════ -->
+  <main id="screen-boot" class="screen active" role="main" aria-label="System boot">
+    <div class="boot-container">
+      <pre id="boot-text" class="boot-text" aria-live="polite"></pre>
+    </div>
+  </main>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       SCREEN 2 — REGISTRATION
+       Collects: Name · Age · Occupation · Tier Filter · Mode
+  ═══════════════════════════════════════════════════════════ -->
+  <section id="screen-registration" class="screen" aria-label="Operative registration">
+
+    <div class="terminal-window" role="form" aria-labelledby="reg-heading">
+      <div class="terminal-titlebar" aria-hidden="true">
+        <div class="terminal-dots">
+          <span class="dot red"></span>
+          <span class="dot yellow"></span>
+          <span class="dot green"></span>
+        </div>
+        <span class="terminal-title">SENTRY v2.0 — OPERATIVE REGISTRATION — 1,635 SCENARIOS</span>
+      </div>
+
+      <div class="terminal-body">
+
+        <!-- SENTRY logo -->
+        <div class="sentry-header">
+          <svg class="sentry-logo-svg" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <filter id="glow2">
+                <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+            </defs>
+            <path d="M40 4L8 16v20c0 20 14 36 32 44 18-8 32-24 32-44V16L40 4z"
+                  fill="#0f172a" stroke="#38bdf8" stroke-width="2.5" filter="url(#glow2)"/>
+            <path d="M40 4L8 16v20c0 20 14 36 32 44 18-8 32-24 32-44V16L40 4z"
+                  fill="none" stroke="rgba(56,189,248,0.2)" stroke-width="6"/>
+            <path d="M28 41l9 9 16-16" stroke="#22c55e" stroke-width="4"
+                  fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow2)"/>
+            <circle cx="40" cy="38" r="14" fill="none" stroke="rgba(56,189,248,0.12)" stroke-width="1"/>
+          </svg>
+          <h1 id="reg-heading">SENTRY</h1>
+          <p class="sentry-subtitle">Social Engineering Awareness Training · v2.0</p>
+
+          <!-- Dataset stats row -->
+          <div class="dataset-stats-row" aria-label="Dataset statistics">
+            <span class="dstat">📦 1,635 Scenarios</span>
+            <span class="dstat">🗂️ 10 Series</span>
+            <span class="dstat">🎯 3 Tiers</span>
+            <span class="dstat">👥 5 Occupations</span>
+          </div>
+        </div>
+
+        <!-- SENTRY briefing -->
+        <div class="sentry-intro-message" role="note">
+          <p>
+            <strong style="color:var(--accent-blue)">SENTRY &gt;</strong>
+            Welcome, Operative. This system exposes you to 1,635 adaptive social engineering
+            scenarios across 10 thematic series — from Banking &amp; Finance to
+            Cryptocurrency &amp; Investment — contextualised for the Nigerian threat landscape.
+            Select your profile to begin.
+          </p>
+        </div>
+
+        <!-- Registration form -->
+        <div class="reg-form">
+
+          <!-- Name -->
+          <div class="form-field">
+            <label for="reg-name">OPERATIVE NAME</label>
+            <input type="text" id="reg-name" placeholder="Enter your full name"
+                   autocomplete="off" maxlength="60" aria-required="true"
+                   aria-describedby="reg-name-error">
+            <span id="reg-name-error" class="form-error hidden" role="alert"></span>
+          </div>
+
+          <!-- Age -->
+          <div class="form-field">
+            <label for="reg-age">AGE</label>
+            <input type="number" id="reg-age" placeholder="Your age"
+                   min="10" max="100" aria-required="true"
+                   aria-describedby="reg-age-error">
+            <span id="reg-age-error" class="form-error hidden" role="alert"></span>
+          </div>
+
+          <!-- Occupation — drives adaptive filtering -->
+          <div class="form-field">
+            <label for="reg-occupation">
+              OCCUPATION PROFILE
+              <span class="field-sublabel">(adapts your scenario set)</span>
+            </label>
+            <select id="reg-occupation" aria-required="true" aria-describedby="reg-occ-error">
+              <option value="">— Select your occupation —</option>
+              <option value="Student" selected>Student</option>
+              <option value="IT Professional">IT Professional</option>
+              <option value="Healthcare Worker">Healthcare Worker</option>
+              <option value="Government Employee">Government Employee</option>
+              <option value="General Public">General Public</option>
+            </select>
+            <span id="reg-occ-error" class="form-error hidden" role="alert"></span>
+          </div>
+
+          <!-- Two-column row: Tier + Mode -->
+          <div class="form-row-2col">
+
+            <!-- Tier filter -->
+            <div class="form-field">
+              <label for="reg-tier">
+                DIFFICULTY TIER
+                <span class="field-sublabel">(filters by tier)</span>
+              </label>
+              <select id="reg-tier" aria-label="Select difficulty tier">
+                <option value="all">All Tiers</option>
+                <option value="Novice">🛡️ Novice (Level 1)</option>
+                <option value="Defender">⚔️ Defender (Level 2)</option>
+                <option value="Sentinel">🦅 Sentinel (Level 3)</option>
+              </select>
+            </div>
+
+            <!-- Session mode -->
+            <div class="form-field">
+              <label for="reg-mode">
+                SESSION MODE
+                <span class="field-sublabel">(scenario count)</span>
+              </label>
+              <select id="reg-mode" aria-label="Select session mode">
+                <option value="quick">⚡ Quick (5)</option>
+                <option value="standard" selected>⚙️ Standard (10)</option>
+                <option value="marathon">🏃 Marathon (20)</option>
+              </select>
+            </div>
+
+          </div>
+
+          <!-- Series preview grid -->
+          <div class="series-preview" aria-label="Available series">
+            <div class="series-preview-label">AVAILABLE SERIES</div>
+            <div class="series-grid">
+              <span class="series-pill">🏦 Banking &amp; Finance</span>
+              <span class="series-pill">🏛️ Government &amp; Identity</span>
+              <span class="series-pill">🎓 Education &amp; Academia</span>
+              <span class="series-pill">🏥 Healthcare &amp; Medical</span>
+              <span class="series-pill">💼 Corporate &amp; Professional</span>
+              <span class="series-pill">📱 Social Media &amp; Digital</span>
+              <span class="series-pill">📡 Telecom &amp; Mobile</span>
+              <span class="series-pill">🛒 E-commerce &amp; Shopping</span>
+              <span class="series-pill">🔒 Physical Security</span>
+              <span class="series-pill">₿ Cryptocurrency &amp; Investment</span>
+            </div>
+          </div>
+
+          <!-- Submit -->
+          <button id="reg-submit" class="btn-primary" type="button"
+                  aria-label="Begin training session">
+            INITIALISE TRAINING SESSION
+            <span class="btn-arrow" aria-hidden="true">▶</span>
+          </button>
+
+          <!-- Analyzer shortcut -->
+          <button id="reg-analyzer-btn" class="btn-analyzer-launch" type="button"
+                  aria-label="Open Message Analyzer">
+            <span class="btn-icon">🔍</span>
+            ANALYSE A SUSPICIOUS MESSAGE
+          </button>
+
+        </div><!-- /.reg-form -->
+      </div><!-- /.terminal-body -->
+    </div><!-- /.terminal-window -->
+
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       SCREEN 3 — GAME
+  ═══════════════════════════════════════════════════════════ -->
+  <section id="screen-game" class="screen" aria-label="Training scenario">
+
+    <!-- HUD -->
+    <header class="game-hud" role="banner" aria-label="Training HUD">
+
+      <div class="hud-segment">
+        <span class="hud-label">OPERATIVE</span>
+        <span class="hud-value" id="hud-player"
+              style="font-size:1rem; font-family:var(--font-ui); color:var(--text-primary);">—</span>
+      </div>
+
+      <div class="hud-center">
+        <div class="rank-display">
+          <span id="hud-rank-icon" aria-hidden="true">🛡️</span>
+          <span id="hud-rank">Cyber Novice</span>
+        </div>
+        <div class="xp-bar-track" role="progressbar" aria-label="XP progress">
+          <div class="xp-bar-fill" id="xp-bar-fill" style="width:0%"></div>
+        </div>
+        <div style="font-family:var(--font-ui); font-size:0.6rem; color:var(--text-muted); letter-spacing:0.12em;">
+          <span id="hud-xp">0</span>&nbsp;XP
+        </div>
+      </div>
+
+      <div class="hud-segment">
+        <span class="hud-label">STREAK</span>
+        <div class="hud-streak-container">
+          <span aria-hidden="true">🔥</span>
+          <span class="hud-value" id="hud-streak">0</span>
+        </div>
+      </div>
+
+    </header>
+
+    <!-- Series badge bar -->
+    <div class="series-badge-bar" aria-label="Current series">
+      <span id="hud-series" class="hud-series-badge">🔍 Loading...</span>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="progress-bar-container" role="progressbar" aria-label="Scenario progress">
+      <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      <span class="progress-text" id="progress-text" aria-live="polite">SCENARIO 1 / —</span>
+    </div>
+
+    <!-- Main game area -->
+    <div class="game-area">
+
+      <!-- SENTRY guidance -->
+      <div class="sentry-guidance-panel" role="note" aria-label="SENTRY guidance">
+        <span class="sentry-tag" aria-hidden="true">SENTRY &gt;</span>
+        <p id="sentry-message" aria-live="polite">Analysing threat profile...</p>
+      </div>
+
+      <!-- Scenario card -->
+      <article class="scenario-card" aria-label="Threat scenario">
+
+        <div class="scenario-meta" aria-label="Scenario metadata">
+          <span id="scenario-type-badge"  class="type-badge">Phishing</span>
+          <span id="scenario-level"       class="scenario-level">LVL 1</span>
+          <span id="scenario-tier-badge"  class="scenario-tier">Novice</span>
+          <span id="scenario-occupation"  class="scenario-occupation">STUDENT</span>
+        </div>
+
+        <!-- Series label inside card -->
+        <div id="scenario-series" class="scenario-series-label"
+             aria-label="Threat series">🏦 Banking &amp; Finance</div>
+
+        <hr style="border:none; border-top:1px solid rgba(56,189,248,0.1); margin:12px 0 16px;">
+
+        <span class="scenario-prompt-label" aria-hidden="true">◈ THREAT SCENARIO DETECTED</span>
+        <p id="scenario-text" class="scenario-text" aria-live="polite">Loading scenario...</p>
+      </article>
+
+      <!-- Choices -->
+      <div class="choices-section" aria-label="Response options">
+        <span class="choices-label" aria-hidden="true">◈ SELECT YOUR RESPONSE</span>
+        <div id="choices-container" class="choices-container"
+             role="group" aria-label="Response choices">
+          <!-- Populated by script.js -->
+        </div>
+      </div>
+
+      <!-- Hint -->
+      <div class="hint-section">
+        <button id="hint-btn" class="btn-hint" type="button"
+                aria-label="Reveal pedagogical hint at cost of 5 XP"
+                aria-controls="hint-box" aria-expanded="false">
+          💡 USE HINT  [ −5 XP ]
+        </button>
+        <div id="hint-box" class="hint-box hidden"
+             role="complementary" aria-label="SENTRY hint">
+          <span aria-hidden="true">💡</span>
+          <span id="hint-text" class="hint-text"></span>
+        </div>
+      </div>
+
+    </div><!-- /.game-area -->
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       SCREEN 4 — FEEDBACK / RED FLAG ANALYSIS
+  ═══════════════════════════════════════════════════════════ -->
+  <section id="screen-feedback" class="screen" aria-label="Red Flag Analysis debrief">
+
+    <div class="feedback-container">
+
+      <!-- Result banner -->
+      <div id="result-banner" class="result-banner correct" role="alert" aria-live="assertive">
+        ✓  THREAT NEUTRALISED — CORRECT RESPONSE
+      </div>
+
+      <!-- Breach simulation (wrong answers) -->
+      <div id="breach-warning" class="breach-warning hidden" role="alert" aria-live="polite">
+        <div class="breach-header" aria-hidden="true">⚠ SECURITY BREACH SIMULATED</div>
+        <p id="breach-details" class="breach-details">Review the Red Flag Analysis below.</p>
+      </div>
+
+      <!-- XP / streak metrics -->
+      <div class="feedback-stats">
+        <div id="xp-change-display" class="xp-change positive" aria-live="polite">+0 XP</div>
+        <div id="streak-notification" class="streak-notification hidden" aria-live="polite"></div>
+        <div id="correct-answer-display" class="correct-answer-display hidden" aria-live="polite"></div>
+      </div>
+
+      <!-- ── RED FLAG ANALYSIS ───────────────────────────────── -->
+      <div class="red-flag-analysis terminal-window" aria-label="Red Flag Analysis">
+
+        <div class="terminal-titlebar" aria-hidden="true">
+          <div class="terminal-dots">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+          </div>
+          <span class="terminal-title">RED FLAG ANALYSIS — SENTRY THREAT DEBRIEF v2.0</span>
+        </div>
+
+        <div class="rfa-header">
+          <span class="rfa-title" aria-hidden="true">◈ THREAT DEBRIEF</span>
+          <span id="attack-type-display" class="attack-type-display">Phishing · Level 1</span>
+        </div>
+
+        <!-- Series label inside RFA -->
+        <div style="padding: 8px 18px 0; font-family:var(--font-ui); font-size:0.68rem;
+                    font-weight:700; letter-spacing:0.1em; color:var(--text-muted); text-transform:uppercase;">
+          <span id="rfa-series">🏦 Banking &amp; Finance</span>
+        </div>
+
+        <!-- Psychological principle -->
+        <div class="psych-principle-container" aria-label="Manipulation principle">
+          <span class="psych-label">Manipulation Principle:</span>
+          <span id="psych-principle" class="psych-principle" aria-live="polite">
+            Authority + Urgency
+          </span>
+        </div>
+
+        <!-- Explanation -->
+        <div class="explanation-container">
+          <p id="red-flag-explanation" class="red-flag-explanation" aria-live="polite">
+            Loading analysis...
+          </p>
+        </div>
+
+      </div><!-- /.red-flag-analysis -->
+
+      <!-- Next button -->
+      <button id="next-btn" class="btn-primary" type="button"
+              aria-label="Proceed to next scenario">
+        PROCEED TO NEXT SCENARIO
+        <span class="btn-arrow" aria-hidden="true">▶</span>
+      </button>
+
+    </div><!-- /.feedback-container -->
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       SCREEN 5 — SESSION COMPLETE
+  ═══════════════════════════════════════════════════════════ -->
+  <section id="screen-complete" class="screen" aria-label="Session complete">
+
+    <div class="complete-container">
+
+      <div class="complete-header">
+        <div class="screen-eyebrow">◈ TRAINING SESSION COMPLETE</div>
+        <h2>DEBRIEF SUMMARY</h2>
+        <p class="complete-player-name" id="complete-player-name">Mission complete.</p>
+      </div>
+
+      <!-- Rank badge -->
+      <div id="complete-rank-badge" class="rank-badge-large badge-novice"
+           role="img" aria-label="Rank badge">
+        <span id="complete-rank-icon" aria-hidden="true">🛡️</span>
+        <span id="complete-rank-name"
+              style="font-size:0.62rem; text-align:center; line-height:1.3;">
+          Cyber Novice
+        </span>
+      </div>
+
+      <!-- Final XP -->
+      <div style="text-align:center;">
+        <div style="font-family:var(--font-terminal); font-size:3rem;
+                    color:var(--accent-blue); text-shadow:var(--glow-blue); line-height:1;">
+          <span id="complete-final-xp">0</span>&nbsp;XP
+        </div>
+        <div style="font-family:var(--font-ui); font-size:0.65rem; color:var(--text-muted);
+                    letter-spacing:0.15em; text-transform:uppercase; margin-top:4px;">
+          TOTAL EXPERIENCE POINTS EARNED
+        </div>
+      </div>
+
+      <!-- Rank description -->
+      <p id="complete-rank-desc" class="complete-rank-desc" aria-live="polite">
+        Session analysis complete.
+      </p>
+
+      <!-- Stats grid -->
+      <div class="complete-stats-grid" role="list" aria-label="Session statistics">
+        <div class="stat-box" role="listitem">
+          <div class="stat-value" id="complete-accuracy">0%</div>
+          <div class="stat-label">Accuracy</div>
+        </div>
+        <div class="stat-box" role="listitem">
+          <div class="stat-value" id="complete-scenarios">0</div>
+          <div class="stat-label">Scenarios</div>
+        </div>
+        <div class="stat-box" role="listitem">
+          <div class="stat-value" id="complete-mistakes"
+               style="color:var(--accent-red);">0</div>
+          <div class="stat-label">Mistakes</div>
+        </div>
+        <div class="stat-box" role="listitem">
+          <div class="stat-value" id="complete-hints"
+               style="color:var(--accent-amber);">0</div>
+          <div class="stat-label">Hints Used</div>
+        </div>
+      </div>
+
+      <!-- Series coverage -->
+      <div class="series-coverage-block" aria-label="Series coverage">
+        <div class="series-coverage-label">SERIES COVERED THIS SESSION</div>
+        <p id="complete-series-summary" class="series-coverage-text">—</p>
+      </div>
+
+      <!-- Actions -->
+      <div class="complete-actions">
+        <button id="download-report-btn" class="btn-primary" type="button"
+                aria-label="Download session report">
+          ⬇ DOWNLOAD SESSION REPORT
+        </button>
+        <div class="complete-actions-row">
+          <button id="play-again-btn" class="btn-secondary" type="button">
+            ↺ PLAY AGAIN
+          </button>
+          <button id="leaderboard-btn" class="btn-secondary" type="button">
+            🏆 LEADERBOARD
+          </button>
+        </div>
+        <button id="complete-analyzer-btn" class="btn-analyzer-launch" type="button"
+                aria-label="Open Message Analyzer">
+          <span class="btn-icon">🔍</span>
+          ANALYSE A SUSPICIOUS MESSAGE
+        </button>
+      </div>
+
+      <footer style="text-align:center; margin-top:8px;">
+        <p style="font-family:var(--font-ui); font-size:0.6rem; color:var(--text-muted);
+                  letter-spacing:0.08em; line-height:1.7;">
+          SENTRY v2.0 · Social Engineering Awareness Game · Final Year Project<br>
+          Daniel Olubajo · Computer Science · 1,635 Scenarios · Nigeria 🇳🇬
+        </p>
+      </footer>
+
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       SCREEN 6 — LEADERBOARD
+  ═══════════════════════════════════════════════════════════ -->
+  <section id="screen-leaderboard" class="screen" aria-label="Leaderboard">
+
+    <div class="leaderboard-container">
+
+      <div class="leaderboard-header">
+        <div class="screen-eyebrow">◈ LOCAL RANKINGS — TOP 5 OPERATIVES</div>
+        <h2>🏆 LEADERBOARD</h2>
+        <p>Scores stored on this device. Complete a session to appear here.</p>
+      </div>
+
+      <!-- Column headers -->
+      <div class="lb-header-row" aria-hidden="true">
+        <span>#</span>
+        <span>Name</span>
+        <span>Occupation</span>
+        <span>Accuracy</span>
+        <span>XP</span>
+        <span>Rank</span>
+        <span>Date</span>
+      </div>
+
+      <div id="leaderboard-entries" class="leaderboard-entries"
+           role="list" aria-live="polite"></div>
+
+      <div class="leaderboard-actions">
+        <button id="back-from-leaderboard-btn" class="btn-secondary" type="button">
+          ← BACK TO SUMMARY
+        </button>
+        <button id="clear-leaderboard-btn" class="btn-danger" type="button">
+          🗑 CLEAR BOARD
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       SCREEN 7 — MESSAGE ANALYZER
+  ═══════════════════════════════════════════════════════════ -->
+  <section id="screen-analyzer" class="screen" aria-label="Message Analyzer">
+    <div class="analyzer-container">
+      <div class="terminal-window">
+        <div class="terminal-titlebar" aria-hidden="true">
+          <div class="terminal-dots">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+          </div>
+          <span class="terminal-title">SENTRY — THREAT SCANNER v2.0</span>
+        </div>
+
+        <div class="terminal-body analyzer-body">
+
+          <!-- Header -->
+          <div class="analyzer-header">
+            <div class="screen-eyebrow">◈ ACTIVE INTELLIGENCE MODULE</div>
+            <h2 class="analyzer-title">
+              <span class="analyzer-icon">🔍</span>
+              MESSAGE THREAT ANALYZER
+            </h2>
+            <p class="analyzer-subtitle">
+              Paste any email, SMS, or WhatsApp message. SENTRY scans for social
+              engineering patterns, manipulation tactics, and Nigerian fraud indicators
+              using a three-tier detection engine.
+            </p>
+          </div>
+
+          <!-- Input panel -->
+          <div class="analyzer-input-panel">
+            <label class="analyzer-input-label" for="analyzer-textarea">
+              PASTE SUSPICIOUS MESSAGE
+            </label>
+            <textarea
+              id="analyzer-textarea"
+              class="analyzer-textarea"
+              placeholder="Paste email body, SMS, WhatsApp message, or any suspicious text here...
+
+Example:
+URGENT: Dear Customer, your GTBank account BVN verification has expired. Under CBN Directive, you must re-verify within 24 hours or face account suspension. Click http://gtb-verify.net/login now.
+— GTBank Security Team"
+              aria-label="Message text to analyse"
+              rows="8"
+              spellcheck="false"
+            ></textarea>
+            <div class="analyzer-input-footer">
+              <span id="analyzer-char-count" class="analyzer-char-count">0 characters</span>
+              <div class="analyzer-btns">
+                <button id="analyzer-clear-btn" class="btn-secondary analyzer-btn-sm" type="button">
+                  ✕ CLEAR
+                </button>
+                <button id="analyzer-scan-btn" class="btn-primary" type="button"
+                        aria-label="Scan message for threats">
+                  ⚡ SCAN MESSAGE
+                  <span class="btn-arrow" aria-hidden="true">▶</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Scanning animation -->
+          <div id="analyzer-scanning" class="analyzer-scanning hidden" aria-live="polite">
+            <div class="scan-beam"></div>
+            <div class="scan-grid">
+              <span class="scan-tier-label">TIER 1</span>
+              <div class="scan-tier-bar"><div id="scan-bar-t1" class="scan-tier-bar-fill"></div></div>
+              <span class="scan-tier-label">TIER 2</span>
+              <div class="scan-tier-bar"><div id="scan-bar-t2" class="scan-tier-bar-fill"></div></div>
+              <span class="scan-tier-label">TIER 3</span>
+              <div class="scan-tier-bar"><div id="scan-bar-t3" class="scan-tier-bar-fill"></div></div>
+            </div>
+            <div class="scan-status">
+              <span class="scan-label">SENTRY &gt;</span>
+              <span id="scan-status-text">Initialising threat detection...</span>
+            </div>
+          </div>
+
+          <!-- Results panel -->
+          <div id="analyzer-results" class="analyzer-results hidden" aria-live="polite">
+
+            <!-- Verdict + confidence -->
+            <div id="analyzer-verdict-block" class="analyzer-verdict-block">
+              <div class="verdict-eyebrow">◈ THREAT ASSESSMENT</div>
+
+              <div id="analyzer-verdict-badge" class="analyzer-verdict-badge verdict-unknown"
+                   aria-label="Threat verdict">
+                <span id="analyzer-verdict-icon">?</span>
+              </div>
+
+              <div id="analyzer-verdict-label" style="color:var(--text-muted)">ANALYSING</div>
+
+              <div class="analyzer-confidence-row">
+                <span class="conf-label">CONFIDENCE</span>
+                <div class="conf-bar-track" role="progressbar"
+                     aria-label="Confidence level" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                  <div id="conf-bar-fill" class="conf-bar-fill" style="width:0%"></div>
+                </div>
+                <span id="conf-pct" class="conf-pct">0%</span>
+              </div>
+            </div>
+
+            <!-- Stats row -->
+            <div id="analyzer-stats-row" class="analyzer-stats-row">
+              <div class="astat-box">
+                <div id="astat-type"   class="astat-value">—</div>
+                <div class="astat-label">Attack Type</div>
+              </div>
+              <div class="astat-box">
+                <div id="astat-flags"  class="astat-value" style="color:var(--accent-red)">0</div>
+                <div class="astat-label">Red Flags</div>
+              </div>
+              <div class="astat-box">
+                <div id="astat-principles" class="astat-value" style="color:var(--accent-amber)">0</div>
+                <div class="astat-label">Psych Vectors</div>
+              </div>
+              <div class="astat-box">
+                <div id="astat-risk"   class="astat-value">LOW</div>
+                <div class="astat-label">Risk Level</div>
+              </div>
+            </div>
+
+            <!-- Red flags -->
+            <div class="analyzer-section-block">
+              <div class="analyzer-section-title">RED FLAG ANALYSIS</div>
+              <div id="analyzer-flags-list" class="analyzer-flags-list"></div>
+            </div>
+
+            <!-- Annotated text -->
+            <div class="analyzer-section-block">
+              <div class="analyzer-section-title">ANNOTATED MESSAGE</div>
+              <div id="analyzer-annotated-text" class="analyzer-annotated-text"></div>
+              <div class="hl-legend">
+                <div class="hl-legend-item"><div class="hl-dot" style="background:rgba(239,68,68,0.5)"></div> Urgency</div>
+                <div class="hl-legend-item"><div class="hl-dot" style="background:rgba(245,158,11,0.5)"></div> Suspicious URL</div>
+                <div class="hl-legend-item"><div class="hl-dot" style="background:rgba(56,189,248,0.5)"></div> Brand Reference</div>
+                <div class="hl-legend-item"><div class="hl-dot" style="background:rgba(34,197,94,0.5)"></div> Financial Lure</div>
+                <div class="hl-legend-item"><div class="hl-dot" style="background:rgba(248,113,113,0.5)"></div> Threat/Coercion</div>
+              </div>
+            </div>
+
+            <!-- Psych principles -->
+            <div id="analyzer-psych-block" class="analyzer-section-block">
+              <div class="analyzer-section-title">MANIPULATION PRINCIPLES DETECTED</div>
+              <div id="analyzer-psych-pills" class="analyzer-psych-pills"></div>
+            </div>
+
+            <!-- SENTRY recommendation -->
+            <div id="analyzer-recommendation" class="sentry-guidance-panel analyzer-recommendation">
+              <span class="sentry-tag" aria-hidden="true">SENTRY&gt;</span>
+              <p id="analyzer-rec-text">Analysis complete.</p>
+            </div>
+
+          </div><!-- /#analyzer-results -->
+
+          <!-- Action buttons -->
+          <div class="analyzer-actions">
+            <button id="analyzer-back-btn" class="btn-secondary" type="button">← BACK</button>
+            <button id="analyzer-new-btn" class="btn-secondary hidden" type="button">↺ NEW SCAN</button>
+          </div>
+
+        </div><!-- /.terminal-body -->
+      </div><!-- /.terminal-window -->
+    </div><!-- /.analyzer-container -->
+  </section>
+
+
+  <!--
+  ══════════════════════════════════════════════════════════════
+  SCRIPTS — load order is critical
+    1. data_fallback.js  → defines FALLBACK_SCENARIOS (offline/demo)
+    2. script.js         → game engine (references FALLBACK_SCENARIOS)
+  ══════════════════════════════════════════════════════════════
+  -->
+  <script src="data_fallback.js"></script>
+  <script src="script.js"></script>
+
+</body>
+</html>
