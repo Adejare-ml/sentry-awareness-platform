@@ -1,2 +1,26 @@
-models_and_vectors
-data
+# Data — not tracked (too large, contains PII)
+data/
+data_raw/
+
+# Old model directory name (legacy)
+models_and_vectors/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Virtual environments
+venv/
+env/
+.env
+
+# OS
+.DS_Store
+Thumbs.db
