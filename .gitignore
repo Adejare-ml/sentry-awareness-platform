@@ -1,26 +1,25 @@
-# Data — not tracked (too large, contains PII)
-data/
-data_raw/
-
-# Old model directory name (legacy)
-models_and_vectors/
-
-# Python
+# Byte-compiled / optimized / DLL files
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-
-# Jupyter
-.ipynb_checkpoints/
-*.ipynb_checkpoints
+*.py[cod]
+*$py.class
 
 # Virtual environments
 venv/
 env/
+.venv/
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# IDEs
+.vscode/
+.idea/
+
+# Environment variables
 .env
 
-# OS
-.DS_Store
-Thumbs.db
+# ML Models & Data dumps
+*.h5
+*.pkl
+*.onnx
+*.pth
