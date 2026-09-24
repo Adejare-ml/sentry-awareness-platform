@@ -1,0 +1,3 @@
+## 2024-05-15 - [Pre-compile Regex & Memoize NLTK Lemmatizer in Data Preprocessing]
+**Learning:** In SENTRY's Jupyter notebook (`notebooks/model_training.ipynb`), the `clean_text` function relies on NLTK's `WordNetLemmatizer` inside a list comprehension across large datasets (e.g., ~450k Enron emails). Without optimization, calling `re.sub` and `lemmatizer.lemmatize` in every loopiteration for every word is a major performance bottleneck for NLP model training.
+**Action:** Always pre-compile regular expressions (e.g., `re.compile(r'[^a-zA-Z\s]')`) outside the function scope, and wrap `lemmatize()` with `functools.lru_cache(maxsize=None)` to memoize lookups. This dramatically speeds up text cleaning over large text corpora.
