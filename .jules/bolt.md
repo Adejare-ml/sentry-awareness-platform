@@ -1,0 +1,3 @@
+## 2024-09-27 - NLTK WordNetLemmatizer Bottleneck
+**Learning:** In the ML pipeline for SENTRY v2.0, NLTK's `WordNetLemmatizer` is a significant performance bottleneck when processing large datasets (e.g., 447k+ rows) during text cleaning. Repeatedly initializing and calling `lemmatize()` and uncompiled regular expressions on every word adds significant overhead.
+**Action:** Always wrap `lemmatize()` calls with `functools.lru_cache` and pre-compile regular expressions using `re.compile` before the loop. This reduces processing time dramatically by caching the results of frequent words and executing compiled regex logic.
