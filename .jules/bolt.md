@@ -1,0 +1,3 @@
+## 2024-10-08 - [NLP Preprocessing Performance Bottlenecks]
+**Learning:** NLTK's `WordNetLemmatizer` and uncompiled regular expressions are significant performance bottlenecks when applied per-row on large text datasets (like the Enron or Spam datasets). Creating the `WordNetLemmatizer` inside the row-processing function or repeatedly calling it for the same words wastes computation. Similarly, compiling regex on every `re.sub()` call slows down processing.
+**Action:** Always pre-compile regular expressions using `re.compile()` before row-processing functions. Furthermore, wrap expensive word-level operations like `lemmatizer.lemmatize()` with `@functools.lru_cache` to drastically reduce redundant NLP computations across large text corpora.
