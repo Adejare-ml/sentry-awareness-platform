@@ -1,0 +1,3 @@
+## 2024-10-16 - NLTK WordNetLemmatizer Bottleneck
+**Learning:** NLTK's `WordNetLemmatizer` is a significant performance bottleneck when applied to large datasets using `pandas.apply()`. Redundant instantiations and repeated processing of common words drastically slow down preprocessing pipelines. Additionally, compiling regex directly within the `apply` mapping function adds unnecessary overhead.
+**Action:** When working with NLTK in large dataset preprocessing, always extract regex compilation outside the loop/function using `re.compile()` and wrap the lemmatization function with `functools.lru_cache` to drastically reduce computation time by memoizing results for frequently occurring words.
