@@ -1,0 +1,3 @@
+## 2025-02-23 - NLTK and Regex Bottlenecks in NLP Preprocessing
+**Learning:** NLTK's `WordNetLemmatizer.lemmatize` function and on-the-fly regex compilation (`re.sub`) can become massive performance bottlenecks when applied to large text datasets (e.g., 447k+ rows) via pandas `apply`. The overhead of processing repeated tokens and recompiling regex per row dominates execution time.
+**Action:** When performing row-wise NLP preprocessing on large datasets in pandas or python loops, ALWAYS wrap NLTK functions (like `lemmatize`) with `@functools.lru_cache` to memoize repeated calls, and always pre-compile regular expressions using `re.compile()` outside the processing loop.
