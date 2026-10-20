@@ -1,0 +1,3 @@
+## 2024-05-18 - [Optimizing Text Cleaning for NLP Datasets]
+**Learning:** NLTK's `WordNetLemmatizer` can be a significant bottleneck during text preprocessing on large NLP datasets because it repeatedly calculates the lemma for common words. In addition, repeated regex pattern matching within string replacement without compilation is inefficient.
+**Action:** When working with heavy NLP preprocessing on large datasets using Pandas/NLTK, wrap the `lemmatize()` calls with `functools.lru_cache` to memoize repetitive results, and pre-compile regular expressions using `re.compile()` before applying them across large dataframes.
